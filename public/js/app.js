@@ -42433,6 +42433,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         unidades: {
             type: Array,
             required: true
+        },
+        name_minuta: {
+            type: String,
+            required: false
         }
     },
     mounted: function mounted() {
@@ -42604,6 +42608,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido completo',
                         action: function action(e, dt, node, config) {
                             window.open("../" + me.minuta.id + "/getPedidoCompleto");
+                        }
+                    }, {
+                        text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
+                        action: function action(e, dt, node, config) {
+                            console.log(me.name_minuta);
+                            window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + id_us + "/" + me.name_minuta);
                         }
                     }, {
                         text: '<i class="fa fa-tasks"></i> Por tipo de producto',

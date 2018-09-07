@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Minuta</title>
+	<title>{{ $name_uds }}</title>
 </head>
 <body>
-	{{-- <pre>
-	{{ print_r($data) }}
-	</pre> --}}
+	
 	<table border="1" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -26,19 +24,19 @@
 			</tr>
 			<tr>
 				<th colspan="2"></th>
-				<th>NOMBRE DE LA UDS: CDI HERRADURA</th>
+				<th>NOMBRE DE LA UDS: {{ $name_uds }}</th>
 			</tr>
 			<tr>
 				<th colspan="2"></th>
-				<th>ENTREGA DE RACIONES -  MENU 24, 25, Y MENU  3</th>
+				<th>ENTREGA DE RACIONES -  {{ $name_minuta }}</th>
 			</tr>
 			<tr>
 				<th colspan="2">CALLE 49 No.3GN - 42 BARRIO VIPASA</th>
-				<th>DIAS DE ATENCION: JUEVES 16, VIERNES 17 MARTES 21   DE AGOSTO DE 2018</th>
+				<th>DIAS DE ATENCION: </th>
 			</tr>
 			<tr>
 				<th colspan="2">TELEFONO 410 2392</th>
-				<th>FECHA DE ENTREGA :14 DE AGOSTO DE 2018 SE ENTREGA 4 DIAS YA QUE EL LUNES 20 DE AGOSTO ES FESTIVO</th>
+				<th>FECHA DE ENTREGA : </th>
 			</tr>
 
 			<tr>
@@ -59,9 +57,19 @@
 				@foreach($data as $dt)
 					<tr>
 						<td>{{ $dt->MENU }}</td>
-						<td>{{ $dt->TOTAL_PEDIDO }}</td>
+						<td>
+							<?php $remanencia = 0; ?>
+							@if(count($remanencias) > 0)
+								@foreach($remanencias as $re)
+									@if($re->producto == $dt->MENU)
+										<?php $remanencia += $re->cantidad; ?>
+									@endif
+								@endforeach
+							@endif
+							{{ (($dt->TOTAL_PEDIDO - $remanencia) < 0) ? 0 : ($dt->TOTAL_PEDIDO - $remanencia) }}
+						</td>
 						<td>{{ $dt->UNIDAD_MEDIDA }}</td>
-						<td></td>
+						<td>{{ ($remanencia > 0) ? 'Remanencia '.$remanencia : '' }}</td>
 					</tr>
 				@endforeach
 			@endif

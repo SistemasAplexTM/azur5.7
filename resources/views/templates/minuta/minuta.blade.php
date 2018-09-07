@@ -14,7 +14,7 @@
                 </div>
                 <div class="ibox-content">
                 <!--***** contenido ******-->
-                	<minuta-component :minuta="{{ json_encode($minuta) }}" :menus="{{ json_encode($menus) }}" :unidades="{{ json_encode($unidades) }}"></minuta-component>
+                	<minuta-component :minuta="{{ json_encode($minuta) }}" :menus="{{ json_encode($menus) }}" :unidades="{{ json_encode($unidades) }}" :name_minuta="{{ json_encode($minuta->name_minuta . $minuta->mes) }}"></minuta-component>
                         
             </div>
             </div>

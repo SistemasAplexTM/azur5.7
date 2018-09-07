@@ -6,6 +6,7 @@ use App\Documento;
 use App\UnidadServicio;
 use App\Minuta;
 use App\Remanencia;
+use App\Exports\InvoicesExportView;
 use App\Exports\InvoicesExport;
 use Auth;
 use DateTime;
@@ -472,19 +473,23 @@ class MinutaController extends Controller
         return \DataTables::of($data)->make(true);
     }
 
-    public function getPedidoCompleto($id_minuta, $product_type = null)
+    public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null)
     {
         $title = 'Pedido completo';
 
+        $wereUds = [['a.minuta_id', $id_minuta]];
+        if($id_uds != null){
+            $wereUds[] = ['b.unidad_servicio_id', $id_uds];
+        }
         $uds = DB::table('minuta_documento_pivot AS a')
             ->join('documento AS b', 'a.documento_id', 'b.id')
             ->join('unidad_servicio AS c', 'b.unidad_servicio_id', 'c.id')
             ->select(DB::raw("DISTINCT b.unidad_servicio_id AS uds"), "c.name AS name_uds")
-            ->where('a.minuta_id', $id_minuta)
+            ->where($wereUds)
             ->get();
 
         $where = [['a.minuta_id', $id_minuta]];
-        if ($product_type != null) {
+        if ($product_type != null and $product_type != 'null') {
             $where[] = ['d.tipo_producto_id', $product_type];
             $product_type_data = DB::table('admin_table AS a')
             ->select('a.name')
@@ -501,7 +506,7 @@ class MinutaController extends Controller
             $flag   = true;
             foreach ($uds as $value) {
                 if ($flag) {
-                    $select .= " IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0)) AS '" . $value->name_uds . "'";
+                    $select .= " IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0)) AS '" . str_replace(' ', '_', $value->name_uds) . "'";
 
                     $total .= "IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0))";
 
@@ -509,7 +514,7 @@ class MinutaController extends Controller
 
                     $flag = false;
                 }else{
-                    $select .= ", IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0)) AS '" . $value->name_uds . "' ";
+                    $select .= ", IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0)) AS '" . str_replace(' ', '_', $value->name_uds) . "' ";
 
                     $total .= " + IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 24) + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * (SELECT y.coverage FROM pivot_unidad_servicio_edad AS y WHERE y.unidad_servicio_id = " . $value->uds . " AND y.grupo_edad_id = 25)) / d.conversion,0))";
 
@@ -552,22 +557,36 @@ class MinutaController extends Controller
                 ->havingRaw($having)
                 ->get();
 
+            $wereR = [['a.minuta_id', $id_minuta]];
+            if($id_uds != null){
+                $wereR[] = ['a.unidad_servicio_id', $id_uds];
+            }
+            $remanencias = DB::table('remanencias AS a')
+            ->join('products AS b', 'a.products_id', 'b.id')
+            ->join('unidad_servicio AS c', 'a.unidad_servicio_id', 'c.id')
+            ->select('b.name AS producto', 'a.cantidad', 'a.unidad_servicio_id AS uds_id', 'c.name AS uds_name')
+            ->where($wereR)
+            ->get();
+
         }
 
         Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
             $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
         });
 
-        // return view('exportView/minuta', compact('data'));
-        return Excel::download(new InvoicesExport("exportView.minuta", $data), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // return view('exportView/minutaAll', compact('data', 'uds'));
+        if($id_uds != null){
+            return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        }else{
+            return Excel::download(new InvoicesExport("exportView.minutaAll", 
+                array(
+                    'datos' => $data, 
+                    'uds' => $uds, 
+                    'remanencias' => $remanencias
+                )
+            ), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);           
+        }
         
-        // $data = collect($data)->map(function($x){ return (array) $x; })->toArray();
-        // return Excel::create($title, function($excel) use ($data) {
-        //     $excel->sheet('pedido', function($sheet) use ($data)
-        //     {
-        //         $sheet->fromArray($data);
-        //     });
-        // })->download('xlsx');
     }
 
     public function getProductsMinuta($id_minuta, $uds_id)
