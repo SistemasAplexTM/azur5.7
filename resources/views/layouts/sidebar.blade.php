@@ -10,7 +10,9 @@
                         <span class="clear">
                             <span class="block m-t-xs">
                                 <strong class="font-bold">
-                                    {{ Auth::user()->name }}
+                                    @if (Auth::check())
+                                        {{ Auth::user()->name }}
+                                    @endif
                                 </strong>
                             </span>
                             <span class="text-muted text-xs block">

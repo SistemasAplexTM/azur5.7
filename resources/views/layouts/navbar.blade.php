@@ -3,7 +3,8 @@
         <nav class="navbar navbar-fixed-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header" style="width: 60%;">
                 <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-                <span class="minimalize-styl-2" style="font-size: 15px;font-weight: bold;">
+                <span class="minimalize-styl-2" style="font-size: 15px;font-weight: bold;color: red;">
+                    {{-- DEMO --}}
                 </span>
             </div>
 

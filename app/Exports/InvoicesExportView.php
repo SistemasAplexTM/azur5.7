@@ -41,7 +41,7 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
-        $drawing->setPath(asset('img/logo.png'));
+        $drawing->setPath(public_path('logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         $drawing->setHeight(90);
         $drawing->setCoordinates('A2');
         $drawing->setOffsetX(5);
