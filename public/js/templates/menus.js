@@ -24,14 +24,14 @@ function getMenus(type_menu) {
                 var params = [
                     full.id, "'" + full.name + "'", full.cliente_id, "'" + full.cliente + "'", full.tipo_us_id, "'" + full.tipo_uds + "'"
                 ];
-                if (permission_update) {
+                // if (permission_update) {
                     var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
                     btns += btn_edit;
-                }
-                if (permission_delete) {
+                // }
+                // if (permission_delete) {
                     var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
                     btns += btn_delete;
-                }
+                // }
                 return btns;
             }
         }]

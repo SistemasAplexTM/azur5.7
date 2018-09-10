@@ -42612,7 +42612,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     }, {
                         text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
                         action: function action(e, dt, node, config) {
-                            console.log(me.name_minuta);
                             window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + id_us + "/" + me.name_minuta);
                         }
                     }, {

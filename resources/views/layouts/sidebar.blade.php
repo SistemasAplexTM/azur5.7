@@ -62,7 +62,7 @@
                             Minutas
                         </a>
                     </li>
-                    @can('menus.index')
+                    {{-- @can('menus.index') --}}
                         <li>
                             <a href="{{ route('menus.index') }}">
                                 <spam class="fa fa-list">
@@ -70,7 +70,7 @@
                                 Menus
                             </a>
                         </li>
-                    @endcan
+                    {{-- @endcan --}}
                 </ul>
             </li>
             <li class="active" id="firstMenu">
