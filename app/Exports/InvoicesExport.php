@@ -11,6 +11,7 @@ class InvoicesExport implements FromView, ShouldAutoSize
     public $data;
     public $remanencias;
     public $uds;
+    public $remanencia;
 
     public function __construct($view, $data = "")
     {
@@ -18,6 +19,7 @@ class InvoicesExport implements FromView, ShouldAutoSize
         $this->data         = $data['datos'];
         $this->remanencias  = $data['remanencias'];
         $this->uds          = $data['uds'];
+        $this->remanencia          = $data['remanencia'];
     }
 
     public function view(): View
@@ -26,6 +28,7 @@ class InvoicesExport implements FromView, ShouldAutoSize
             'data'          => $this->data,
             'remanencias'   => $this->remanencias,
             'uds'           => $this->uds,
+            'reman'           => $this->remanencia,
         ]);
     }
 }

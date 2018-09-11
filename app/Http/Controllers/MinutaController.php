@@ -473,12 +473,12 @@ class MinutaController extends Controller
         return \DataTables::of($data)->make(true);
     }
 
-    public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null)
+    public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null, $remanencia = false)
     {
         $title = 'Pedido completo';
 
         $wereUds = [['a.minuta_id', $id_minuta]];
-        if($id_uds != null){
+        if($id_uds != null and $id_uds != 'null'){
             $wereUds[] = ['b.unidad_servicio_id', $id_uds];
         }
         $uds = DB::table('minuta_documento_pivot AS a')
@@ -557,8 +557,8 @@ class MinutaController extends Controller
                 ->havingRaw($having)
                 ->get();
 
-            $wereR = [['a.minuta_id', $id_minuta]];
-            if($id_uds != null){
+            $wereR = [['a.minuta_id', $id_minuta], ['a.deleted_at', NULL]];
+            if($id_uds != null and $id_uds != 'null'){
                 $wereR[] = ['a.unidad_servicio_id', $id_uds];
             }
             $remanencias = DB::table('remanencias AS a')
@@ -575,16 +575,17 @@ class MinutaController extends Controller
         });
 
         // return view('exportView/minutaAll', compact('data', 'uds'));
-        if($id_uds != null){
-            return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        if($id_uds != null and $id_uds != 'null'){
+            return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }else{
             return Excel::download(new InvoicesExport("exportView.minutaAll", 
                 array(
                     'datos' => $data, 
                     'uds' => $uds, 
-                    'remanencias' => $remanencias
+                    'remanencias' => $remanencias,
+                    'remanencia' => $remanencia
                 )
-            ), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);           
+            ), 'Minuta completa.xlsx', \Maatwebsite\Excel\Excel::XLSX);           
         }
         
     }

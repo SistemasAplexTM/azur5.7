@@ -4,7 +4,6 @@
 	<title>Minuta</title>
 </head>
 <body>
-	
 	<table border="1" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -25,9 +24,37 @@
 						<td>{{ $dt->MENU }}</td>
 						<?php $arr = (array)$dt; ?>
 						@foreach($uds as $ud)
-							<td>{{ $arr[str_replace(' ', '_', $ud->name_uds)] }}</td>
+							@if(!$reman)
+								<td>{{ $arr[str_replace(' ', '_', $ud->name_uds)] }}</td>
+							@else
+								<td>
+									<?php $remanencia = 0; ?>
+									@if(count($remanencias) > 0)
+										@foreach($remanencias as $re)
+											@if($re->producto == $dt->MENU AND $re->uds_name == $ud->name_uds)
+												<?php $remanencia += $re->cantidad; ?>
+											@endif
+										@endforeach
+									@endif
+									{{ (($arr[str_replace(' ', '_', $ud->name_uds)] - $remanencia) < 0) ? 0 : ($arr[str_replace(' ', '_', $ud->name_uds)] - $remanencia) }}
+								</td>
+							@endif
 						@endforeach
-						<td>{{ $dt->TOTAL_PEDIDO }}</td>
+						@if(!$reman)
+							<td>{{ $dt->TOTAL_PEDIDO }}</td>
+						@else
+							<td>
+								<?php $remanencia = 0; ?>
+								@if(count($remanencias) > 0)
+									@foreach($remanencias as $re)
+										@if($re->producto == $dt->MENU)
+											<?php $remanencia += $re->cantidad; ?>
+										@endif
+									@endforeach
+								@endif
+								{{ (($dt->TOTAL_PEDIDO - $remanencia) < 0) ? 0 : ($dt->TOTAL_PEDIDO - $remanencia) }}
+							</td>
+						@endif
 						<td>{{ $dt->UNIDAD_MEDIDA }}</td>
 					</tr>
 				@endforeach

@@ -336,6 +336,12 @@
                                     }
                                 },
                                 {
+                                    text: '<i class="fa fa-print" aria-hidden="true"></i> Completo con remanencias',
+                                    action: function ( e, dt, node, config ) {
+                                        window.open("../"+me.minuta.id+"/getPedidoCompleto/"+ null + "/"+ null + "/"+ null + "/" + true);
+                                    }
+                                },
+                                {
                                     text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
                                     action: function ( e, dt, node, config ) {
                                         window.open("../"+me.minuta.id+"/getPedidoCompleto/"+ null + "/" + id_us + "/" + me.name_minuta);
