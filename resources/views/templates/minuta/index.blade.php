@@ -165,13 +165,22 @@
 		            <div class="modal-body">
 		            	<form id="formPrint" enctype="multipart/form-data" class="form-horizontal" role="form" autocomplete="off">
 			                <div class="row">
-		                    	<div class="col-lg-12">
+		                    	<div class="col-lg-6">
 	                                <div class="form-group">
                                         <label for="produc_type_id" class="control-label gcore-label-top">Tipo de proucto:</label>
                                         <v-select name="produc_type_id" v-model="produc_type_id" label="name" :options="produc_types"  placeholder="Tipo"></v-select>
                                         <small class="help-block">@{{ errors.first('produc_type_id') }}</small>
                                     </div>
 		                        </div>
+		                        <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="remanencia_tipo_prod">Incluir remanencias</label>
+                                        <div class="checkbox checkbox-success checkbox-inline">
+                                            <input type="checkbox" id="remanencia_tipo_prod" name="remanencia_tipo_prod" value="t" v-model="remanencia_tipo_prod">
+                                            <label for="remanencia_tipo_prod">Restar las remanencias de cada UDS</label>
+                                        </div>
+                                    </div>
+                                </div>
 		                    </div>
 	                    </form>
 		            </div>

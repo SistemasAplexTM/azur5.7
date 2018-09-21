@@ -42557,6 +42557,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -42603,13 +42613,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             products: [],
             cantidad: 0,
             uds_id: null,
-            descripcion: null
+            descripcion: null,
+            remanencia_tipo_prod: false
         };
     },
 
     methods: {
         imprimirPedido: function imprimirPedido() {
-            window.open('../' + this.minuta.id + '/getPedidoCompleto/' + this.produc_type_id.id, '_blank');
+            window.open('../' + this.minuta.id + '/getPedidoCompleto/' + this.produc_type_id.id + '/' + null + '/' + null + '/' + this.remanencia_tipo_prod, '_blank');
         },
         getProductType: function getProductType() {
             var me = this;
@@ -43058,7 +43069,7 @@ var render = function() {
                 },
                 [
                   _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-lg-12" }, [
+                    _c("div", { staticClass: "col-lg-6" }, [
                       _c(
                         "div",
                         { staticClass: "form-group" },
@@ -43094,6 +43105,77 @@ var render = function() {
                         ],
                         1
                       )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-lg-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { attrs: { for: "remanencia_tipo_prod" } },
+                          [_vm._v("Incluir remanencias")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            staticClass:
+                              "checkbox checkbox-success checkbox-inline"
+                          },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.remanencia_tipo_prod,
+                                  expression: "remanencia_tipo_prod"
+                                }
+                              ],
+                              attrs: {
+                                type: "checkbox",
+                                id: "remanencia_tipo_prod",
+                                name: "remanencia_tipo_prod",
+                                value: "t"
+                              },
+                              domProps: {
+                                checked: Array.isArray(_vm.remanencia_tipo_prod)
+                                  ? _vm._i(_vm.remanencia_tipo_prod, "t") > -1
+                                  : _vm.remanencia_tipo_prod
+                              },
+                              on: {
+                                change: function($event) {
+                                  var $$a = _vm.remanencia_tipo_prod,
+                                    $$el = $event.target,
+                                    $$c = $$el.checked ? true : false
+                                  if (Array.isArray($$a)) {
+                                    var $$v = "t",
+                                      $$i = _vm._i($$a, $$v)
+                                    if ($$el.checked) {
+                                      $$i < 0 &&
+                                        (_vm.remanencia_tipo_prod = $$a.concat([
+                                          $$v
+                                        ]))
+                                    } else {
+                                      $$i > -1 &&
+                                        (_vm.remanencia_tipo_prod = $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1)))
+                                    }
+                                  } else {
+                                    _vm.remanencia_tipo_prod = $$c
+                                  }
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "label",
+                              { attrs: { for: "remanencia_tipo_prod" } },
+                              [_vm._v("Restar las remanencias de cada UDS")]
+                            )
+                          ]
+                        )
+                      ])
                     ])
                   ])
                 ]

@@ -141,6 +141,7 @@ var objVue = new Vue({
         disabled_us: true,
         disabled_menu: true,
         minuta_id_print: null,
+        remanencia_tipo_prod: false,
     },
     methods: {
         setSelects: function(){
@@ -306,7 +307,7 @@ var objVue = new Vue({
             });
         },
         imprimirPedido: function(){
-            window.open('minuta/'+this.minuta_id_print+'/getPedidoCompleto/' + this.produc_type_id.id, '_blank');
+            window.open('minuta/'+this.minuta_id_print+'/getPedidoCompleto/' + this.produc_type_id.id  + '/' + null + '/' + null + '/' + this.remanencia_tipo_prod, '_blank');
         }
     },
 });

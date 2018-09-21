@@ -59,11 +59,20 @@
                     <div class="modal-body">
                         <form id="formPrint" enctype="multipart/form-data" class="form-horizontal" role="form" autocomplete="off">
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="produc_type_id" class="control-label gcore-label-top">Tipo de proucto:</label>
                                         <v-select name="produc_type_id" v-model="produc_type_id" label="name" :options="produc_types"  placeholder="Tipo"></v-select>
                                         <small class="help-block">{{ errors.first('produc_type_id') }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="remanencia_tipo_prod">Incluir remanencias</label>
+                                        <div class="checkbox checkbox-success checkbox-inline">
+                                            <input type="checkbox" id="remanencia_tipo_prod" name="remanencia_tipo_prod" value="t" v-model="remanencia_tipo_prod">
+                                            <label for="remanencia_tipo_prod">Restar las remanencias de cada UDS</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -76,6 +85,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- modal agregar remanencias -->
         <div class="modal fade bs-example" id="modalRemanencias" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -192,11 +202,12 @@
                 cantidad: 0,
                 uds_id: null,
                 descripcion: null,
+                remanencia_tipo_prod: false,
 		    }
 		},
         methods:{
             imprimirPedido: function(){
-                window.open('../'+ this.minuta.id +'/getPedidoCompleto/' + this.produc_type_id.id, '_blank');
+                window.open('../'+ this.minuta.id +'/getPedidoCompleto/' + this.produc_type_id.id + '/' + null + '/' + null + '/' + this.remanencia_tipo_prod, '_blank');
             },
             getProductType: function() {
                 let me = this;

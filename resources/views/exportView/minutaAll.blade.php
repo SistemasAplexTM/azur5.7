@@ -4,6 +4,7 @@
 	<title>Minuta</title>
 </head>
 <body>
+	
 	<table border="1" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -24,7 +25,7 @@
 						<td>{{ $dt->MENU }}</td>
 						<?php $arr = (array)$dt; ?>
 						@foreach($uds as $ud)
-							@if(!$reman)
+							@if(!$reman || $reman == 'false')
 								<td>{{ $arr[str_replace(' ', '_', $ud->name_uds)] }}</td>
 							@else
 								<td>
@@ -40,7 +41,7 @@
 								</td>
 							@endif
 						@endforeach
-						@if(!$reman)
+						@if(!$reman || $reman == 'false')
 							<td>{{ $dt->TOTAL_PEDIDO }}</td>
 						@else
 							<td>

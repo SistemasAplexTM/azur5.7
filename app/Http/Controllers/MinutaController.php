@@ -274,13 +274,13 @@ class MinutaController extends Controller
         ));
     }
 
-/**
- * Update the specified resource in storage.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  \App\Minuta  $Minuta
- * @return \Illuminate\Http\Response
- */
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Minuta  $Minuta
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $id)
     {
         try {
