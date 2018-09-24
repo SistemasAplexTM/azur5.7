@@ -4,7 +4,7 @@
             <li class="nav-header">
                 <div class="dropdown profile-element">
                     <span>
-                        <img alt="image" class="img-circle" id="imgProfile" style="width: 150px;" src="{{ asset('storage/aplextm - Gmail.png') }}"/>
+                        <img alt="image" class="img-circle" id="imgProfile" style="width: 150px;" src="{{ asset('img/logo.png') }}"/>
                     </span>
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <span class="clear">
