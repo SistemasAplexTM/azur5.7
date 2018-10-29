@@ -227,7 +227,7 @@ class MinutaController extends Controller
         $unidades = DB::table('minuta_documento_pivot AS a')
             ->Join('documento AS b', 'a.documento_id', 'b.id')
             ->Join('unidad_servicio AS c', 'b.unidad_servicio_id', 'c.id')
-            ->Join(DB::raw('(SELECT
+            ->leftJoin(DB::raw('(SELECT
                                 z.documento_id,
                                 z.coverage
                             FROM
@@ -238,7 +238,7 @@ class MinutaController extends Controller
                                 z.documento_id,
                                 z.coverage
                         ) AS d'), 'b.id', 'd.documento_id')
-            ->Join(DB::raw('(SELECT
+            ->leftJoin(DB::raw('(SELECT
                                 z.documento_id,
                                 z.coverage
                             FROM
