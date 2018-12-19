@@ -38,7 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::get('user/getDataSelect/{table}', 'UserController@getDataSelect');
 
     /* ADMIN_TABLE */
-    Route::delete('administracion/{id}', 'AdminTableController@destroy');
+    Route::delete('administracion/{type}/delete/{id}', 'AdminTableController@destroy');
     Route::post('administracion/', 'AdminTableController@store');
     Route::put('administracion/update/{type}/{id}', 'AdminTableController@update');
     Route::get('administracion/{type}/all', 'AdminTableController@getAll');
@@ -49,7 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     /*--- MODULO PRODUCTO ---*/
     Route::resource('product', 'ProductController', ['except' => ['show', 'create', 'edit']]);
-    Route::get('product/all', 'ProductController@getAll')->name('datatable/all');
+    Route::get('product/all/{category}', 'ProductController@getAll')->name('datatable/all');
     Route::get('product/delete/{id}/{logical?}', 'ProductController@delete')->name('product.delete');
     Route::get('product/restaurar/{id}', 'ProductController@restaurar');
     Route::get('product/getDataSelect', 'ProductController@getDataSelect');
@@ -88,6 +88,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('menus/restaurar/{id}/{table?}', 'MenuController@restaurar');
     Route::get('menus/getDataSelect/{tipo_us_id}', 'MenuController@getDataSelect');
     Route::post('menus/updateDetailMenu', 'MenuController@updateDetailMenu');
+    Route::post('menus/changeUnitFinal', 'MenuController@changeUnitFinal');
 
     /*--- MODULO TERCERO ---*/
     Route::resource('tercero', 'TerceroController', ['except' => ['show', 'create', 'edit']]);

@@ -19,8 +19,9 @@ let mix = require('laravel-mix');
 // 	'resources/js/plugins/datapicker/bootstrap-datepicker.js',
 // 	'resources/js/plugins/daterangepicker/daterangepicker.js',
 // 	'resources/js/plugins/sweetalert2/sweetalert2.min.js',
+//   'resources/js/plugins/bootstrapToogle/bootstrap-toggle.min.js',
 // 	], 'public/js/plantilla.js');
-
+//
 // mix.styles([
 // 	/*-- Estilos de la plantilla --*/
 // 	'resources/css/bootstrap/bootstrap.min.css',
@@ -37,6 +38,7 @@ let mix = require('laravel-mix');
 // 	'resources/css/plugins/datapicker/datepicker3.css',
 // 	'resources/css/plugins/daterangepicker/daterangepicker-bs3.css',
 // 	'resources/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css',
+//   'resources/css/plugins/bootstrapToogle/bootstrap-toggle.min.css',
 // 	], 'public/css/plantilla.css');
 
 mix.js('resources/js/app.js' , 'public/js');

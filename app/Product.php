@@ -10,13 +10,13 @@ class Product extends Model
     use SoftDeletes;
     public $table = "products";
     protected $dates = ['deleted_at'];
-    
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'id','name', 'description', 'unidad_medida_id', 'tipo_producto_id', 'conversion'
+        'id','name', 'description', 'unidad_medida_id', 'tipo_producto_id', 'category_id', 'conversion'
     ];
 }

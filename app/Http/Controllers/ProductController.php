@@ -124,11 +124,12 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getAll()
+    public function getAll($category)
     {
         $data = Product::leftJoin('admin_table AS b', 'products.unidad_medida_id', 'b.id')
         ->join('admin_table AS c', 'products.tipo_producto_id', 'c.id')
-        ->select('products.id', 'products.name', 'products.description', 'b.id AS unidad_medida_id', 'b.name AS unidad_medida', 'b.description AS abreviatura', 'products.tipo_producto_id', 'c.name AS tipo_producto', 'products.conversion')
+        ->select('products.id', 'products.name', 'products.description', 'b.id AS unidad_medida_id', 'b.name AS unidad_medida', 'b.description AS abreviatura', 'products.tipo_producto_id', 'products.category_id', 'c.name AS tipo_producto', 'products.conversion')
+        ->where('products.category_id', $category)
         ->get();
         return \DataTables::of($data)->make(true);
     }

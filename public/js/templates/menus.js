@@ -103,6 +103,8 @@ var objVue = new Vue({
         id: null,
         name: null,
         product_id: null,
+        product_id_change: null,
+        um_pedido: null,
         peso: null,
         cliente_id: null,
         cliente: [],
@@ -335,7 +337,13 @@ var objVue = new Vue({
                     }
                 }, {
                     data: 'unidad_medida_ab',
-                    name: 'unidad_medida_ab'
+                    name: 'unidad_medida_ab',
+                    "className": "text-center",
+                }, {
+                  "render": function(data, type, full, meta) {
+                      return '<a data-name="um_pedido" data-pk="' + full.cantidad_1_3_id + '" class="td_edit" data-type="text" data-placement="top" data-title="U.M Pedido">' + full.um_pedido + '</a>';
+                  },
+                    "className": "text-center",
                 }, {
                     sortable: false,
                     "render": function(data, type, full, meta) {
@@ -365,6 +373,33 @@ var objVue = new Vue({
             if (val != null) {
                 $('#unidad_medida').html(val.unidad_medida);
             }
+        },
+        saveChage: function(){
+            let me = this;
+            axios.post('menus/changeUnitFinal', {
+                'product_id': me.product_id_change.id,
+                'unidad_medida_real': me.um_pedido,
+            }).then(function(response) {
+                if (response.data['code'] == 200) {
+                    toastr.success('Registro actualizado correctamente.');
+                    toastr.options.closeButton = true;
+                    me.product_id_change = null;
+                    me.um_pedido = null;
+                    if (!$.fn.DataTable.isDataTable('#tbl-menus_detalle')) {
+                        me.listMenuDetail();
+                    } else {
+                        refreshTable('tbl-menus_detalle');
+                    }
+                } else {
+                    toastr.warning(response.data['error']);
+                    toastr.options.closeButton = true;
+                }
+            }).catch(function(error) {
+                console.log(error);
+                toastr.error("Error. - " + error, {
+                    timeOut: 50000
+                });
+            });
         }
     },
 });

@@ -24,12 +24,12 @@
                     <div class="ibox-title">
                         <h5>Registro de productos</h5>
                         <div class="ibox-tools">
-                            
+
                         </div>
                     </div>
                     <div class="ibox-content">
                         <!--***** contenido ******-->
-                        <div class="row">                            
+                        <div class="row">
                             <div class="col-lg-12">
                                     <div class="form-group" :class="{ 'has-error': errors.has('name') }">
                                         <div class="col-sm-5">
@@ -42,7 +42,7 @@
                                     </div>
                             </div>
                         </div>
-                        <div class="row">                            
+                        <div class="row">
                             <div class="col-lg-12">
                                     <div class="form-group" :class="{ 'has-error': errors.has('description') }">
                                         <div class="col-sm-5">
@@ -55,7 +55,7 @@
                                     </div>
                             </div>
                         </div>
-                        <div class="row">                            
+                        <div class="row">
                             <div class="col-lg-12">
                                     <div class="form-group" :class="{ 'has-error': errors.has('unidad_medida_id') }">
                                         <div class="col-sm-5">
@@ -68,7 +68,7 @@
                                     </div>
                             </div>
                         </div>
-                        <div class="row">                            
+                        <div class="row">
                             <div class="col-lg-12">
                                     <div class="form-group" :class="{ 'has-error': errors.has('conversion') }">
                                         <div class="col-sm-5">
@@ -81,20 +81,34 @@
                                     </div>
                             </div>
                         </div>
-                        <div class="row">                            
+                        <div class="row">
                             <div class="col-lg-12">
-                                    <div class="form-group" :class="{ 'has-error': errors.has('tipo_producto_id') }">
-                                        <div class="col-sm-5">
-                                            <label for="tipo_producto_id" class="control-label gcore-label-top">Tipo de producto:</label>
-                                        </div>
-                                        <div class="col-sm-7">
-                                            <v-select name="tipo_producto_id" v-model="tipo_producto_id" label="name" :filterable="false" :options="tipo_producto" v-validate.disable="'required'" placeholder="Tipo producto"></v-select>
-                                            <small class="help-block">@{{ errors.first('tipo_producto_id') }}</small>
-                                        </div>
+                                <div class="form-group" :class="{ 'has-error': errors.has('tipo_producto_id') }">
+                                    <div class="col-sm-5">
+                                        <label for="tipo_producto_id" class="control-label gcore-label-top">Tipo de producto:</label>
                                     </div>
+                                    <div class="col-sm-7">
+                                        <v-select name="tipo_producto_id" v-model="tipo_producto_id" label="name" :filterable="false" :options="tipo_producto" v-validate.disable="'required'" placeholder="Tipo producto"></v-select>
+                                        <small class="help-block">@{{ errors.first('tipo_producto_id') }}</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
+                        <div class="row">
+                          <div class="col-lg-12">
+                            <div class="form-group">
+                              <div class="col-sm-5">
+                                  <label for="category_id" class="control-label gcore-label-top">Categoria:</label>
+                              </div>
+                              <div class="col-sm-7">
+                                <input name="category_id" id="category_id" class="form-control" type='checkbox'
+                                data-toggle="toggle" data-size='mini' data-on="Alimento" data-off="No alimento" data-width="100" data-style="ios"
+                                data-onstyle="primary" data-offstyle="success" @click="" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         <div class="row">
                             @include('layouts.buttons')
                         </div>
@@ -112,31 +126,66 @@
                 </div>
                 <div class="ibox-content">
                     <!--***** contenido ******-->
-                    <div class="table-responsive">
-                        <table id="tbl-product" class="table table-striped table-hover table-bordered" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Descripción</th>
-                                    <th>Unidad de medida</th>
-                                    <th>Tipo producto</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li role="presentation" class="active"><a href="#alimentos" aria-controls="alimentos" role="tab" data-toggle="tab">Alimentos</a></li>
+                      <li role="presentation"><a href="#no_alimentos" aria-controls="no_alimentos" role="tab" data-toggle="tab">No alimentos</a></li>
+                    </ul>
+                    <div class="tab-content">
+                      <div role="tabpanel" class="tab-pane fade in active" id="alimentos">
+                        <div class="table-responsive" style="margin-top: 20px;">
+                            <table id="tbl-product" class="table table-striped table-hover table-bordered" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Unidad de medida</th>
+                                        <th>Tipo producto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Descripción</th>
-                                    <th>Unidad de medida</th>
-                                    <th>Tipo producto</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>             
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Unidad de medida</th>
+                                        <th>Tipo producto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                      </div>
+                      <div role="tabpanel" class="tab-pane fade in" id="no_alimentos">
+                          <div class="table-responsive" style="margin-top: 20px;">
+                              <table id="tbl-product2" class="table table-striped table-hover table-bordered" style="width: 100%;">
+                                  <thead>
+                                      <tr>
+                                          <th>Nombre</th>
+                                          <th>Descripción</th>
+                                          <th>Unidad de medida</th>
+                                          <th>Tipo producto</th>
+                                          <th>Acciones</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+
+                                  </tbody>
+                                  <tfoot>
+                                      <tr>
+                                          <th>Nombre</th>
+                                          <th>Descripción</th>
+                                          <th>Unidad de medida</th>
+                                          <th>Tipo producto</th>
+                                          <th>Acciones</th>
+                                      </tr>
+                                  </tfoot>
+                              </table>
+                          </div>
+                      </div>
+                  </div>
                 </div>
             </div>
         </div>

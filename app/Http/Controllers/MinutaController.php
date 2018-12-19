@@ -578,16 +578,16 @@ class MinutaController extends Controller
         if($id_uds != null and $id_uds != 'null'){
             return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }else{
-            return Excel::download(new InvoicesExport("exportView.minutaAll", 
+            return Excel::download(new InvoicesExport("exportView.minutaAll",
                 array(
-                    'datos' => $data, 
-                    'uds' => $uds, 
+                    'datos' => $data,
+                    'uds' => $uds,
                     'remanencias' => $remanencias,
                     'remanencia' => $remanencia
                 )
-            ), 'Minuta completa.xlsx', \Maatwebsite\Excel\Excel::XLSX);           
+            ), 'Minuta completa.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }
-        
+
     }
 
     public function getProductsMinuta($id_minuta, $uds_id)

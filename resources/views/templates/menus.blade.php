@@ -25,7 +25,7 @@
                     <div class="ibox-title">
                         <h5>Registro de menus</h5>
                         <div class="ibox-tools">
-                            
+
                         </div>
                     </div>
                     <div class="ibox-content">
@@ -79,16 +79,17 @@
 			                            <thead>
 			                                <tr>
 			                                    <th>Producto</th>
-                                                <th>Grupo edad/Cantidad</th>
+                                          <th>Grupo edad/Cantidad</th>
 			                                    <th>U.M</th>
+			                                    <th>U.M Pedido</th>
 			                                    <th></th>
 			                                </tr>
 			                            </thead>
 			                        </table>
-			                    </div> 
+			                    </div>
                         	</div>
                         </div>
-                        
+
                         <div class="row">
                             @include('layouts.buttons')
                         </div>
@@ -100,7 +101,7 @@
                     <div class="ibox-title">
                         <h5>Menus</h5>
                         <div class="ibox-tools">
-
+                          <button type="button" class="btn btn-success btn-xs" data-target="#modalCambio" data-toggle="modal"><i class="fa fa-refresh"></i> Cambio U.M Pedido</button>
                         </div>
                     </div>
                     <div class="ibox-content">
@@ -142,12 +143,45 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>            
+                        </div>
                     </div>
                 </div>
             </div>
         </form>
+        <div class="modal fade bs-example" id="modalCambio" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog" style="width: 40%;">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-refresh"></i> Este cambio afectara a todos los detalles de todos los menus creados</h4>
+              </div>
+              <div class="modal-body">
+                <form id="formChange" enctype="multipart/form-data" class="form-horizontal" role="form" autocomplete="off">
+                  <div class="row">
+                    <div class="col-lg-7">
+                      <div class="form-group">
+                        <label for="produc_type_id" class="control-label gcore-label-top">Producto:</label>
+                        <v-select name="product_id_change" placeholder="Producto" v-model="product_id_change" label="name" :options="products"></v-select>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div class="form-group">
+                        <label for="remanencia_tipo_prod">U.M Pedido</label>
+                        <input v-model="um_pedido" name="um_pedido" placeholder="Unidad medida final" class="form-control" type="text"/>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
+                <button type="button" class="btn btn-primary" @click="saveChage()"><i class="fa fa-save"></i> Cambiar</button>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
+
 @endsection
 
 @section('scripts')

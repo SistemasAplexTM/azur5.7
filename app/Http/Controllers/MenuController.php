@@ -194,6 +194,7 @@ class MenuController extends Controller
                         ) AS e"), 'menu_detalle.id', 'e.menu_detalle_id')
             ->select(
                 'menu_detalle.id',
+                'menu_detalle.unidad_medida_real AS um_pedido',
                 'b.id AS product_id',
                 'b.name AS product',
                 'c.name AS unidad_medida',
@@ -226,13 +227,15 @@ class MenuController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                 ]
             );
-            DB::table('pivot_menu_detalle_cantidad')->insert(
+            for ($i=24; $i < 26; $i++) {
+              DB::table('pivot_menu_detalle_cantidad')->insert(
                 [
-                    'menu_detalle_id'    => $id,
-                    'grupo_edad_id' => $request->age_group_id,
-                    'cantidad' => $request->cantidad
+                  'menu_detalle_id'    => $id,
+                  'grupo_edad_id' => $i,
+                  'cantidad' => ($request->age_group_id == $i) ? $request->cantidad : 0
                 ]
-            );
+              );
+            }
             if ($id) {
                 $this->AddToLog('Menu detalle creado (id :' . $id . ')');
                 $answer = array(
@@ -262,29 +265,56 @@ class MenuController extends Controller
     public function updateDetailMenu(Request $request)
     {
         try {
+          if($request->name == 'um_pedido'){
+            $pivot = DB::table('pivot_menu_detalle_cantidad')->where('id', $request->pk)->first();
+            MenuDetalle::where('id', $pivot->menu_detalle_id)->update(['unidad_medida_real' => $request->value]);
+            $this->AddToLog('Menu detalle editado (Edicion unidad medida final en la minuta al producto: '. $request->product_id .')');
+          }else{
             DB::table('pivot_menu_detalle_cantidad')
             ->where('id', $request->pk)
             ->update(['cantidad' => $request->value]);
             $this->AddToLog('Menu detalle editado (tbl_detalle_cantidad id ' . $request->pk . ')');
+          }
             $answer = array(
                 "datos"  => '',
                 "code"   => 200,
                 "status" => 200,
             );
             return $answer;
-        } catch (\Exception $e) {
-            $error = '';
-            if (isset($e->errorInfo) and $e->errorInfo) {
-                foreach ($e->errorInfo as $key => $value) {
-                    $error .= $key . ' - ' . $value . ' <br> ';
-                }
-            } else { $error = $e;}
+        } catch (Exception $e) {
             $answer = array(
-                "error"  => $error,
+                "error"  => $e,
                 "code"   => 600,
                 "status" => 500,
             );
             return $answer;
         }
+    }
+
+    public function changeUnitFinal(Request $request)
+    {
+      try {
+          MenuDetalle::where('product_id', $request->product_id)->update(['unidad_medida_real' => $request->unidad_medida_real]);
+          $this->AddToLog('Menu detalle editado (Edicion general de la unidad medida final en la minuta al producto: '. $request->product_id .')');
+          $answer = array(
+              "datos"  => '',
+              "code"   => 200,
+              "status" => 200,
+          );
+          return $answer;
+      } catch (\Exception $e) {
+          $error = '';
+          if (isset($e->errorInfo) and $e->errorInfo) {
+              foreach ($e->errorInfo as $key => $value) {
+                  $error .= $key . ' - ' . $value . ' <br> ';
+              }
+          } else { $error = $e;}
+          $answer = array(
+              "error"  => $error,
+              "code"   => 600,
+              "status" => 500,
+          );
+          return $answer;
+      }
     }
 }
