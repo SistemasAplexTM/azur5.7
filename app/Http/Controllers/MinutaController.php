@@ -409,6 +409,7 @@ class MinutaController extends Controller
 
     public function getMenusUnidadesByMinuta($id_minuta, $id_us)
     {
+      /* asdfsad */
         $fecha = DB::table('minuta_documento_pivot AS a')
             ->join('documento AS b', 'a.documento_id', 'b.id')
             ->select(DB::raw("min(b.fecha) AS fecha"))
