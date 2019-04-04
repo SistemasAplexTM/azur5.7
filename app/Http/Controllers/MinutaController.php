@@ -409,7 +409,6 @@ class MinutaController extends Controller
 
     public function getMenusUnidadesByMinuta($id_minuta, $id_us)
     {
-      /* asdfsad */
         $fecha = DB::table('minuta_documento_pivot AS a')
             ->join('documento AS b', 'a.documento_id', 'b.id')
             ->select(DB::raw("min(b.fecha) AS fecha"))
@@ -446,16 +445,16 @@ class MinutaController extends Controller
                 DB::raw("Round( (Sum( If(b.numero_dia = 3 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '8'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 4 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '9'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 5 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '10'"),
-                DB::raw("Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) as 'st-1'"),
-                DB::raw("Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25), c.cantidad_unit, 0 ))),2) as 'st-2'"),
+                DB::raw($this->st1() . " as 'st-1'"),
+                DB::raw($this->st2() . " as 'st-2'"),
                 /* st-3 = st-1 * covertura */
-                DB::raw("Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) as 'st-3'"),
+                DB::raw($this->st3() . "  as 'st-3'"),
                 /* st-4 = st-2 * covertura */
-                DB::raw("Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)  as 'st-4'"),
+                DB::raw($this->st4() . "  as 'st-4'"),
                 /* GRAN TOTAL (st-5 = st-3 + st-4) */
-                DB::raw("Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)  as 'st-5'"),
+                DB::raw($this->st5() . "  as 'st-5'"),
                 /* GRAN TOTAL (st-6 = (st-3 + st-4)/ b.conversion) */
-                DB::raw("IF((Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0) = 0),1,(Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0))) as 'st-6'")
+                DB::raw($this->st6() . " as 'st-6'")
             )
             ->where([
                 ['b.unidad_servicio_id', $id_us],
@@ -469,9 +468,35 @@ class MinutaController extends Controller
                 'c.unidad_medida',
                 'd.conversion'
             )
-            ->havingRaw("(Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If(b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)) > 0")
+            ->havingRaw($this->having())
             ->get();
         return \DataTables::of($data)->make(true);
+    }
+
+    // COBERTURAS
+    public function cobertura1(){return "(select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24)";}
+
+    public function cobertura2(){return "(select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)";}
+
+    // SUBTOTALES
+    public function st1(){return "Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2)";}
+
+    public function st2(){return "Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25), c.cantidad_unit, 0 ))),2)";}
+
+    public function st3(){return $this->st1() . ' * ' . $this->cobertura1();}
+
+    public function st4(){return $this->st2() . ' * ' . $this->cobertura2();}
+
+    public function st5(){return $this->st3() . ' + ' . $this->st4();}
+
+    public function st6()
+    {
+      return "IF((Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0) = 0),1,(Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0)))";
+    }
+
+    public function having()
+    {
+      return "(Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If(b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)) > 0";
     }
 
     public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null, $remanencia = false)
