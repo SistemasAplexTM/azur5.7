@@ -42827,11 +42827,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     data: 'st-5',
                     name: 'st-5'
                 }, {
-                    data: 'st-6',
-                    name: 'st-6'
+                    data: 'cantidad',
+                    name: 'cantidad'
                 }, {
-                    data: 'unidad_medida_real',
-                    name: 'unidad_medida_real'
+                    data: 'presentacion',
+                    name: 'presentacion'
                 }],
                 'columnDefs': [{ className: "", "targets": [0], width: 200 }],
                 'rowCallback': function rowCallback(row, data, index) {

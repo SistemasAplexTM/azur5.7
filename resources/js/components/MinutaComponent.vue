@@ -43,7 +43,7 @@
         				</tr>
         			</thead>
         			<tbody>
-        				
+
         			</tbody>
 	        	</table>
 	        </div>
@@ -420,11 +420,11 @@
                         data: 'st-5',
                         name: 'st-5'
                     }, {
-                        data: 'st-6',
-                        name: 'st-6'
+                        data: 'cantidad',
+                        name: 'cantidad'
                     }, {
-                        data: 'unidad_medida_real',
-                        name: 'unidad_medida_real'
+                        data: 'presentacion',
+                        name: 'presentacion'
                     }],
                     'columnDefs': [
                         { className: "", "targets": [ 0 ], width: 200, }
