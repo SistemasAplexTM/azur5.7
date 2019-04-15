@@ -108,7 +108,44 @@
                             </div>
                           </div>
                         </div>
-
+                        <div class="row">
+                          <div class="col-lg-12">
+                            <div class="form-group">
+                              <div class="col-sm-5">
+                                  <label for="category_id" class="control-label gcore-label-top">HCB:</label>
+                              </div>
+                              <div class="col-sm-7">
+                               <el-select multiple v-model="presentation_hcb" filterable placeholder="Presentaciones" size="medium" style="width: 100%">
+                                <el-option
+                                  v-for="item in presentaciones"
+                                  :key="item.id"
+                                  :label="item.name"
+                                  :value="item.id">
+                                </el-option>
+                               </el-select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-12">
+                            <div class="form-group">
+                              <div class="col-sm-5">
+                                  <label for="category_id" class="control-label gcore-label-top">CDI:</label>
+                              </div>
+                              <div class="col-sm-7">
+                               <el-select multiple v-model="presentation_cdi" filterable placeholder="Presentaciones" size="medium" style="width: 100%">
+                                <el-option
+                                  v-for="item in presentaciones"
+                                  :key="item.id"
+                                  :label="item.name"
+                                  :value="item.id">
+                                </el-option>
+                               </el-select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <div class="row">
                             @include('layouts.buttons')
                         </div>

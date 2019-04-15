@@ -53,6 +53,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('product/delete/{id}/{logical?}', 'ProductController@delete')->name('product.delete');
     Route::get('product/restaurar/{id}', 'ProductController@restaurar');
     Route::get('product/getDataSelect', 'ProductController@getDataSelect');
+    Route::get('getPresentaciones', 'ProductController@getPresentaciones');
+    Route::get('presentacionSeleccionada/{id}', 'ProductController@presentacionSeleccionada');
 
     /*--- MODULO CLIENTES ---*/
     Route::resource('clientes', 'ClienteController', ['except' => ['show', 'create', 'edit']]);

@@ -429,12 +429,23 @@ class MinutaController extends Controller
                 $join->on('f.grupo_edad_id', '=', 'e.id')
                     ->on('f.unidad_servicio_id', '=', 'b.unidad_servicio_id');
             })
+            ->join('unidad_servicio AS us', 'b.unidad_servicio_id', 'us.id')
+            ->leftJoin(DB::raw('(SELECT
+          		b.`name`,
+          		b.description AS conversion,
+          		a.producto_id,
+          		a.tipo_uds_id
+          	FROM
+          		pivot_producto_presentacion AS a
+          		INNER JOIN admin_table AS b ON a.presentacion_id = b.id ) AS z'), 'z.producto_id', DB::raw('d.id AND z.tipo_uds_id = us.tipo_unidad_servicio_id '))
             ->select(
                 'a.minuta_id',
                 'c.products_id',
                 'd.name AS producto',
                 'c.unidad_medida_real',
                 'c.unidad_medida',
+                'z.name AS presentacion',
+                'z.conversion',
                 DB::raw("Round( (Sum( If(b.numero_dia = 1 and  c.edad_id = 24, c.cantidad_unit, NULL ))),2) as '1'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 2 and  c.edad_id = 24, c.cantidad_unit, NULL ))),2) as '2'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 3 and  c.edad_id = 24, c.cantidad_unit, NULL ))),2) as '3'"),
@@ -454,7 +465,9 @@ class MinutaController extends Controller
                 /* GRAN TOTAL (st-5 = st-3 + st-4) */
                 DB::raw($this->st5() . "  as 'st-5'"),
                 /* GRAN TOTAL (st-6 = (st-3 + st-4)/ b.conversion) */
-                DB::raw($this->st6() . " as 'st-6'")
+                DB::raw($this->st6() . " as 'st-6'"),
+                DB::raw($this->cantidad_final() . " AS 'cantidad'"),
+                DB::raw("( " . $this->cantidad_final() . " * z.conversion) - (" . $this->st5() . ") AS 'r_f'")
             )
             ->where([
                 ['b.unidad_servicio_id', $id_us],
@@ -466,11 +479,116 @@ class MinutaController extends Controller
                 'd.name',
                 'c.unidad_medida_real',
                 'c.unidad_medida',
-                'd.conversion'
+                'd.conversion',
+                'z.name',
+                'z.conversion'
             )
             ->havingRaw($this->having())
             ->get();
+            $data = $this->replace_presentation($data);
+
         return \DataTables::of($data)->make(true);
+    }
+
+    public function replace_presentation($data)
+    {
+      $products = [];
+      $answer = [];
+      if ($data) {
+        $flag = 0;
+        foreach ($data as $key => $value) {
+          $flag = $value->products_id;
+          if ($value->cantidad) {
+            if ($flag == $value->products_id) {
+              $products[$value->products_id][$key] = $value;
+            }
+          }else{
+            $answer[] = $value;
+          }
+        }
+      }
+
+
+      foreach ($products as $key_p => $value_p) {
+        $flag = true;
+        $cero = [];
+        $mayorCero = [];
+        $menorCero = [];
+        foreach ($value_p as $key_v => $value_v) {
+          if ($value_v->r_f == 0) {
+            $cero[$key_v][] = $value_v;
+          }
+          if ($value_v->r_f >= 0) {
+            $mayorCero[$key_v] = $value_v;
+          }
+          if ($value_v->r_f <= 0) {
+            $menorCero[$key_v] = $value_v;
+          }
+        }
+
+        $result = [];
+        $min = 999999;
+        if ($cero) {
+          foreach ($cero as $key_mc => $value_mc) {
+            if ($min >= $value_mc->r_f) {
+              $result[$key_mc] = $value_mc;
+              $min = $value_mc->r_f;
+            }
+          }
+          if (count($result) >= 1) {
+            $minCant = 10000;
+            $resp = [];
+            foreach ($result as $key_res => $value_res) {
+              if ($minCant >= $value_res->cantidad) {
+                $resp = $value_res;
+                $minCant = $value_res->cantidad;
+              }
+            }
+            $result = $resp;
+          }
+          $answer[] = $result;
+        }elseif ($mayorCero) {
+          foreach ($mayorCero as $key_mc => $value_mc) {
+            if ($min >= $value_mc->r_f) {
+              $result[$key_mc] = $value_mc;
+              $min = $value_mc->r_f;
+            }
+          }
+          if (count($result) >= 1) {
+            $minCant = 10000;
+            $resp = [];
+            foreach ($result as $key_res => $value_res) {
+              if ($minCant >= $value_res->cantidad) {
+                $resp = $value_res;
+                $minCant = $value_res->cantidad;
+              }
+            }
+            $result = $resp;
+          }
+          $answer[] = $result;
+        }elseif ($menorCero) {
+          foreach ($menorCero as $key_mc => $value_mc) {
+            if ($min >= $value_mc->r_f) {
+              $result[$key_mc] = $value_mc;
+              $min = $value_mc->r_f;
+            }
+          }
+          if (count($result) >= 1) {
+            $minCant = 10000;
+            $resp = [];
+            foreach ($result as $key_res => $value_res) {
+              if ($minCant >= $value_res->cantidad) {
+                $resp = $value_res;
+                $minCant = $value_res->cantidad;
+              }
+            }
+            $result = $resp;
+          }
+          $answer[] = $result;
+        }
+
+      }
+      return $answer;
     }
 
     // COBERTURAS
@@ -492,6 +610,11 @@ class MinutaController extends Controller
     public function st6()
     {
       return "IF((Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0) = 0),1,(Round((Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24) + Round( (Sum( If((b.feriado = 0 and DATEDIFF(b.fecha,@unidad_fecha1) +1) >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25, c.cantidad_unit, 0 ))),2) * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25))/d.conversion,0)))";
+    }
+
+    public function cantidad_final()
+    {
+      return "ROUND((" . $this->st5() . ") / z.conversion)";
     }
 
     public function having()

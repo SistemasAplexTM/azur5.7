@@ -25,6 +25,7 @@ var objVue = new Vue({
     mounted: function() {
         this.getUnidadMedida();
         this.getTipoProducto();
+        this.getPresentaciones();
         const dict = {
             custom: {
                 name: {
@@ -51,18 +52,24 @@ var objVue = new Vue({
         unidad_medidas: [],
         tipo_producto_id: null,
         tipo_producto: [],
-        editar: 0
+        presentaciones: [],
+        editar: 0,
+        presentation_cdi: null,
+        presentation_hcb: null
     },
     methods: {
         resetForm: function() {
-            this.id = null;
-            this.name = null;
-            this.description = null;
-            this.conversion = null;
-            this.unidad_medida_id = null;
-            this.tipo_producto_id = null;
-            this.editar = 0;
-            this.errors.clear();
+          this.id = null;
+          this.name = null;
+          this.description = null;
+          this.conversion = null;
+          this.unidad_medida_id = null;
+          this.tipo_producto_id = null;
+          this.editar = 0;
+          this.tipo_producto = [];
+          this.presentation_cdi = [];
+          this.presentation_hcb = [];
+          this.errors.clear();
         },
         rollBackDelete: function(data) {
             var urlRestaurar = 'product/restaurar/' + data.id;
@@ -90,6 +97,8 @@ var objVue = new Vue({
                         'conversion': (this.conversion == null) ? 1 : this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
+                        'presentaciones_hcb': this.presentation_hcb,
+                        'presentaciones_cdi': this.presentation_cdi,
                         'category_id': $('#category_id').prop('checked'),
                     }).then(function(response) {
                         if (response.data['code'] == 200) {
@@ -126,9 +135,12 @@ var objVue = new Vue({
                         'conversion': (this.conversion == null) ? 1 : this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
+                        'presentaciones_hcb': this.presentation_hcb,
+                        'presentaciones_cdi': this.presentation_cdi,
                         'category_id': $('#category_id').prop('checked'),
                     }).then(function(response) {
                         if (response.data['code'] == 200) {
+
                             toastr.success('Registro Actualizado correctamente');
                             toastr.options.closeButton = true;
                             me.editar = 0;
@@ -157,6 +169,7 @@ var objVue = new Vue({
             this.name = data['name'];
             this.description = data['description'];
             this.conversion = data['conversion'];
+            this.presentacionSeleccionada(data['id']);
             if(data['description'] == 'null'){
                 this.description = null;
             }
@@ -227,6 +240,27 @@ var objVue = new Vue({
                   }
               }]
           });
+        },
+        getPresentaciones: function() {
+            let me = this;
+            axios.get('getPresentaciones').then(function(response) {
+                me.presentaciones = response.data;
+            }).catch(function(error) {
+                console.log(error);
+                toastr.warning('Error.');
+                toastr.options.closeButton = true;
+            });
+        },
+        presentacionSeleccionada: function(id){
+         let me = this;
+         // Pendiente traer los datos para editar y guardarlos
+         axios.get('presentacionSeleccionada/' + id).then(function(response){
+          me.presentation_cdi = response.data.cdi;
+          me.presentation_hcb = response.data.hcb;
+          console.log(this.presentation_hcb);
+         }).catch(function(error){
+          console.log(error);
+         })
         }
     },
 });
