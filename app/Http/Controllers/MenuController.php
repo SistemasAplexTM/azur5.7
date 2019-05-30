@@ -148,6 +148,13 @@ class MenuController extends Controller
      */
     public function getAll($type)
     {
+      if($type == 1){
+        $type = 'cdi';
+      }else{
+        if($type == 2){
+          $type = 'hcb';
+        }
+      }
         $data = Menu::join('clientes as b', 'menu.cliente_id', 'b.id')
             ->join('admin_table AS c', 'menu.tipo_us_id', 'c.id')
             ->select('menu.id', 'menu.name', 'menu.cliente_id', 'b.name AS cliente', 'menu.tipo_us_id', 'c.name AS tipo_uds')
@@ -311,6 +318,61 @@ class MenuController extends Controller
           } else { $error = $e;}
           $answer = array(
               "error"  => $error,
+              "code"   => 600,
+              "status" => 500,
+          );
+          return $answer;
+      }
+    }
+
+    public function copyMenu($menu_id, $menu_id_copy)
+    {
+      try {
+          /* ELIMINO LOS DETALLES DEL MENU SELECCIONADO */
+          MenuDetalle::where([['menu_id', $menu_id_copy], ['deleted_at', null]])->delete();
+          /* COPIO LOS DETALLES DEL MENU ELEGIDO */
+          $data = MenuDetalle::where([['menu_id', $menu_id], ['deleted_at', null]])->get();
+          foreach ($data as $key => $value) {
+            /* INSERTO EL NUEVO DETALLE DEL MENU A COPIAR */
+            $id = DB::table('menu_detalle')->insertGetId(
+                [
+                    'menu_id'    => $menu_id_copy,
+                    'product_id' => $value->product_id,
+                    'unidad_medida' => $value->unidad_medida,
+                    'unidad_medida_real' => $value->unidad_medida_real,
+                    'conversion' => $value->conversion,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]
+            );
+            /* OBTENGO LAS CANTIDADES DEL MENU COPIADO PARA REGISTRARLOS EN EL MENU A COPIAR*/
+            $pivot = DB::table('pivot_menu_detalle_cantidad AS a')
+                ->select(
+                  'a.id',
+                  'a.menu_detalle_id',
+                  'a.grupo_edad_id',
+                  'a.cantidad')
+                ->where('menu_detalle_id', $value->id)
+                ->get();
+
+            foreach ($pivot as $key2 => $val) {
+              // INSERTO LAS CANTIDADES AL NUEVO MENU
+              DB::table('pivot_menu_detalle_cantidad')->insert(
+                [
+                  'menu_detalle_id'    => $id,
+                  'grupo_edad_id' => $val->grupo_edad_id,
+                  'cantidad' => $val->cantidad
+                ]
+              );
+            }
+          }
+          $answer = array(
+              "datos"  => $data,
+              "code"   => 200
+          );
+          return $answer;
+      } catch (\Exception $e) {
+          $answer = array(
+              "error"  => $e,
               "code"   => 600,
               "status" => 500,
           );

@@ -148,6 +148,56 @@
                 </div>
             </div>
         </form>
+
+        <div class="modal fade bs-example" id="modalCopy" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog" style="width: 40%;">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-copy"></i> Copiar al @{{ name_menu }} de @{{ name_uds }}</h4>
+              </div>
+              <div class="modal-body">
+                <form id="formCopy" class="form-horizontal" role="form" autocomplete="off">
+                  <p>Selecciona el menu desde donde deseas copiar la información y reemplazarla por el menu seleccionado.</p>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="produc_type_id" class="control-label gcore-label-top">Copiar desde:</label>
+                        <el-select v-model="tipo_uds_id" filterable placeholder="Seleccione" value-key="id">
+                          <el-option
+                            v-for="item in tipo_us"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                          </el-option>
+                        </el-select>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="remanencia_tipo_prod">El Menu:</label>
+                        <el-select v-model="menus_id" filterable placeholder="Seleccione" value-key="id">
+                          <el-option
+                            v-for="item in menus"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                          </el-option>
+                        </el-select>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
+                <el-button type="primary" @click="copyMenu()" :loading="loading" size="small"><i class="fa fa-save"></i> @{{ coping }}</el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
         <div class="modal fade bs-example" id="modalCambio" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <div class="modal-dialog" style="width: 40%;">
             <div class="modal-content">

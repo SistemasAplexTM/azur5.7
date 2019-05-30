@@ -26,3 +26,11 @@
   .dropdown-toggle>input[type="search"]:focus:valid {
       width: 100% !important;
   }
+
+.el-select-dropdown{
+  z-index: 9999!important;
+}
+
+.el-select{
+  width: 100%;
+}

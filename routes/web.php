@@ -49,12 +49,13 @@ Route::group(['middleware' => 'auth'], function () {
 
     /*--- MODULO PRODUCTO ---*/
     Route::resource('product', 'ProductController', ['except' => ['show', 'create', 'edit']]);
-    Route::get('product/all/{category}', 'ProductController@getAll')->name('datatable/all');
+    Route::get('product/all', 'ProductController@getAll')->name('datatable/all');
     Route::get('product/delete/{id}/{logical?}', 'ProductController@delete')->name('product.delete');
     Route::get('product/restaurar/{id}', 'ProductController@restaurar');
     Route::get('product/getDataSelect', 'ProductController@getDataSelect');
     Route::get('getPresentaciones', 'ProductController@getPresentaciones');
     Route::get('presentacionSeleccionada/{id}', 'ProductController@presentacionSeleccionada');
+    Route::get('product/replaceProducts', 'ProductController@replaceProducts');
 
     /*--- MODULO CLIENTES ---*/
     Route::resource('clientes', 'ClienteController', ['except' => ['show', 'create', 'edit']]);
@@ -91,6 +92,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('menus/getDataSelect/{tipo_us_id}', 'MenuController@getDataSelect');
     Route::post('menus/updateDetailMenu', 'MenuController@updateDetailMenu');
     Route::post('menus/changeUnitFinal', 'MenuController@changeUnitFinal');
+    Route::get('menus/copyMenu/{menu_id}/{menu_id_copy}', 'MenuController@copyMenu');
 
     /*--- MODULO TERCERO ---*/
     Route::resource('tercero', 'TerceroController', ['except' => ['show', 'create', 'edit']]);

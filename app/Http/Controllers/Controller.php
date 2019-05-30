@@ -88,9 +88,9 @@ class Controller extends BaseController
         $this->otrasFechasCalculadas(-3); //jueves santo
         $this->otrasFechasCalculadas(-2); //viernes santo
 
-        $this->otrasFechasCalculadas(36, true); //Ascenci�n el Se�or pascua
-        $this->otrasFechasCalculadas(60, true); //Corpus Cristi
-        $this->otrasFechasCalculadas(68, true); //Sagrado Coraz�n
+        //$this->otrasFechasCalculadas(36, true); //Ascenci�n el Se�or pascua
+        //$this->otrasFechasCalculadas(60, true); //Corpus Cristi
+        //$this->otrasFechasCalculadas(68, true); //Sagrado Coraz�n
         // otras fechas importantes que no son festivos
         // $this->otrasFechasCalculadas(-46);       // Mi�rcoles de Ceniza
         // $this->otrasFechasCalculadas(-46);       // Mi�rcoles de Ceniza
@@ -135,7 +135,6 @@ class Controller extends BaseController
     {
         $mes_festivo = date("n", mktime(0, 0, 0, $this->pascua_mes, $this->pascua_dia + $cantidadDias, $this->ano));
         $dia_festivo = date("d", mktime(0, 0, 0, $this->pascua_mes, $this->pascua_dia + $cantidadDias, $this->ano));
-
         if ($siguienteLunes) {
             $this->calcula_emiliani($mes_festivo, $dia_festivo);
         } else {

@@ -1,12 +1,36 @@
 $(document).ready(function() {
-    //
+    //  
 });
 $(window).load(function() {
-  objVue.list(1, 'product');
-  objVue.list(0, 'product2');
+    $('#tbl-product').DataTable({
+        ajax: 'product/all',
+        columns: [{
+            data: 'name',
+            name: 'name'
+        }, {
+            data: 'description',
+            name: 'description'
+        }, {
+            data: 'unidad_medida',
+            name: 'unidad_medida'
+        }, {
+            data: 'tipo_producto',
+            name: 'tipo_producto'
+        }, {
+            sortable: false,
+            "render": function(data, type, full, meta) {
+                var params = [
+                    full.id, "'" + full.name + "'", "'" + full.description + "'", full.unidad_medida_id, "'" + full.unidad_medida + "'", full.tipo_producto_id, "'" + full.tipo_producto + "'", full.conversion
+                ];
+                var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
+                var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
+                return btn_edit + btn_delete;
+            }
+        }]
+    });
 });
 
-function edit(id, name, description, unidad_medida_id, unidad_medida, tipo_producto_id, category_id, tipo_producto, conversion) {
+function edit(id, name, description, unidad_medida_id, unidad_medida, tipo_producto_id, tipo_producto, conversion) {
     var data = {
         id: id,
         name: name,
@@ -16,7 +40,6 @@ function edit(id, name, description, unidad_medida_id, unidad_medida, tipo_produ
         tipo_producto_id: tipo_producto_id,
         tipo_producto: tipo_producto,
         conversion: conversion,
-        category_id: category_id,
     };
     objVue.edit(data);
 }
@@ -25,7 +48,6 @@ var objVue = new Vue({
     mounted: function() {
         this.getUnidadMedida();
         this.getTipoProducto();
-        this.getPresentaciones();
         const dict = {
             custom: {
                 name: {
@@ -52,37 +74,29 @@ var objVue = new Vue({
         unidad_medidas: [],
         tipo_producto_id: null,
         tipo_producto: [],
-        presentaciones: [],
-        editar: 0,
-        presentation_cdi: null,
-        presentation_hcb: null
+        editar: 0
     },
     methods: {
         resetForm: function() {
-          this.id = null;
-          this.name = null;
-          this.description = null;
-          this.conversion = null;
-          this.unidad_medida_id = null;
-          this.tipo_producto_id = null;
-          this.editar = 0;
-          this.tipo_producto = [];
-          this.presentation_cdi = [];
-          this.presentation_hcb = [];
-          this.errors.clear();
+            this.id = null;
+            this.name = null;
+            this.description = null;
+            this.conversion = null;
+            this.unidad_medida_id = null;
+            this.tipo_producto_id = null;
+            this.editar = 0;
+            this.errors.clear();
         },
         rollBackDelete: function(data) {
             var urlRestaurar = 'product/restaurar/' + data.id;
             axios.get(urlRestaurar).then(response => {
                 toastr.success('Registro restaurado.');
                 refreshTable('tbl-product');
-                refreshTable('tbl-product2');
             });
         },
         delete: function(data) {
             axios.delete('product/' + data.id).then(response => {
                 refreshTable('tbl-product');
-                refreshTable('tbl-product2');
                 toastr.success("<div><p>Registro eliminado exitosamente.</p><button type='button' onclick='deshacerEliminar(" + data.id + ")' id='okBtn' class='btn btn-xs btn-danger pull-right'><i class='fa fa-reply'></i> Restaurar</button></div>");
                 toastr.options.closeButton = true;
             });
@@ -94,19 +108,15 @@ var objVue = new Vue({
                     axios.post('product', {
                         'name': this.name,
                         'description': this.description,
-                        'conversion': (this.conversion == null) ? 1 : this.conversion,
+                        'conversion': this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
-                        'presentaciones_hcb': this.presentation_hcb,
-                        'presentaciones_cdi': this.presentation_cdi,
-                        'category_id': $('#category_id').prop('checked'),
                     }).then(function(response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro creado correctamente.');
                             toastr.options.closeButton = true;
                             me.resetForm();
                             refreshTable('tbl-product');
-                            refreshTable('tbl-product2');
                         } else {
                             toastr.warning(response.data['error']);
                             toastr.options.closeButton = true;
@@ -132,21 +142,16 @@ var objVue = new Vue({
                     axios.put('product/' + this.id, {
                         'name': this.name,
                         'description': this.description,
-                        'conversion': (this.conversion == null) ? 1 : this.conversion,
+                        'conversion': this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
-                        'presentaciones_hcb': this.presentation_hcb,
-                        'presentaciones_cdi': this.presentation_cdi,
-                        'category_id': $('#category_id').prop('checked'),
                     }).then(function(response) {
                         if (response.data['code'] == 200) {
-
                             toastr.success('Registro Actualizado correctamente');
                             toastr.options.closeButton = true;
                             me.editar = 0;
                             me.resetForm();
                             refreshTable('tbl-product');
-                            refreshTable('tbl-product2');
                         } else {
                             toastr.warning(response.data['error']);
                             toastr.options.closeButton = true;
@@ -169,7 +174,6 @@ var objVue = new Vue({
             this.name = data['name'];
             this.description = data['description'];
             this.conversion = data['conversion'];
-            this.presentacionSeleccionada(data['id']);
             if(data['description'] == 'null'){
                 this.description = null;
             }
@@ -181,11 +185,6 @@ var objVue = new Vue({
                 id: data['tipo_producto_id'],
                 name: data['tipo_producto']
             };
-            if(data['category_id'] == 1){
-              $('#category_id').bootstrapToggle('on');
-            }else{
-              $('#category_id').bootstrapToggle('off');
-            }
             this.editar = 1;
             this.mostrar_password = false;
         },
@@ -213,54 +212,5 @@ var objVue = new Vue({
                 toastr.options.closeButton = true;
             });
         },
-        list: function(category, table){
-          $('#tbl-'+table).DataTable({
-              ajax: 'product/all/' + category,
-              columns: [{
-                  data: 'name',
-                  name: 'name'
-              }, {
-                  data: 'description',
-                  name: 'description'
-              }, {
-                  data: 'unidad_medida',
-                  name: 'unidad_medida'
-              }, {
-                  data: 'tipo_producto',
-                  name: 'tipo_producto'
-              }, {
-                  sortable: false,
-                  "render": function(data, type, full, meta) {
-                      var params = [
-                          full.id, "'" + full.name + "'", "'" + full.description + "'", full.unidad_medida_id, "'" + full.unidad_medida + "'", full.tipo_producto_id, full.category_id, "'" + full.tipo_producto + "'", full.conversion
-                      ];
-                      var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
-                      var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
-                      return btn_edit + btn_delete;
-                  }
-              }]
-          });
-        },
-        getPresentaciones: function() {
-            let me = this;
-            axios.get('getPresentaciones').then(function(response) {
-                me.presentaciones = response.data;
-            }).catch(function(error) {
-                console.log(error);
-                toastr.warning('Error.');
-                toastr.options.closeButton = true;
-            });
-        },
-        presentacionSeleccionada: function(id){
-         let me = this;
-         // Pendiente traer los datos para editar y guardarlos
-         axios.get('presentacionSeleccionada/' + id).then(function(response){
-          me.presentation_cdi = response.data.cdi;
-          me.presentation_hcb = response.data.hcb;
-          console.log(this.presentation_hcb);
-         }).catch(function(error){
-          console.log(error);
-         })
-        }
     },
 });

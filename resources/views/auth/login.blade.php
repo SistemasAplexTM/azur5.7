@@ -99,8 +99,6 @@
                                 </a>
                             </div>
                             <p class="m-t"> <small>Power by AplexTM &copy;</small> </p>
-                            <p class="m-t"> <small>Usuario: admin@admin.com</small> </p>
-                            <p class="m-t"> <small>Contraseña: admin123</small> </p>
                             
                         </div>
                     </form>

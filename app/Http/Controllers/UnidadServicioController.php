@@ -128,7 +128,7 @@ class UnidadServicioController extends Controller
     {
         $data = UnidadServicio::join('clientes AS b', 'unidad_servicio.cliente_id', 'b.id')
         ->join('admin_table AS c', 'unidad_servicio.tipo_unidad_servicio_id', 'c.id')
-        ->leftjoin(DB::raw("(SELECT
+        ->leftJoin(DB::raw("(SELECT
                             a.unidad_servicio_id,
                             a.grupo_edad_id,
                             b.`name`,
@@ -139,7 +139,7 @@ class UnidadServicioController extends Controller
                         WHERE
                             a.grupo_edad_id = 24
                     ) AS d"), 'unidad_servicio.id', 'd.unidad_servicio_id')
-        ->leftjoin(DB::raw("(SELECT
+        ->leftJoin(DB::raw("(SELECT
                             a.unidad_servicio_id,
                             a.grupo_edad_id,
                             b.`name`,

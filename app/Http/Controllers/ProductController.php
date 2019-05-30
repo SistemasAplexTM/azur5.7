@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\AdminTable;
 
 class ProductController extends Controller
 {
@@ -31,14 +30,6 @@ class ProductController extends Controller
             $data             = (new Product)->fill($request->all());
             $data->created_at = date('Y-m-d H:i:s');
             if ($data->save()) {
-             foreach ($request->presentaciones_cdi as $key => $value_cdi) {
-              DB::table('pivot_producto_presentacion')
-              ->insert(['producto_id' => $data->id, 'tipo_uds_id' => 1, 'presentacion_id' => $value_cdi]);
-             }
-             foreach ($request->presentaciones_hcb as $key => $value_hcb) {
-              DB::table('pivot_producto_presentacion')
-              ->insert(['producto_id' => $data->id, 'tipo_uds_id' => 2, 'presentacion_id' => $value_hcb]);
-             }
                 $this->AddToLog('Producto creado (id :'.$data->id.')');
                 $answer = array(
                     "datos"  => $request->all(),
@@ -74,15 +65,6 @@ class ProductController extends Controller
         try {
             $data           = Product::findOrFail($id);
             $data->update($request->all());
-            DB::table('pivot_producto_presentacion')->where('producto_id', $id)->delete();
-            foreach ($request->presentaciones_cdi as $key => $value_cdi) {
-             DB::table('pivot_producto_presentacion')
-             ->insert(['producto_id' => $id, 'tipo_uds_id' => 1, 'presentacion_id' => $value_cdi]);
-            }
-            foreach ($request->presentaciones_hcb as $key => $value_hcb) {
-             DB::table('pivot_producto_presentacion')
-             ->insert(['producto_id' => $id, 'tipo_uds_id' => 2, 'presentacion_id' => $value_hcb]);
-            }
             $this->AddToLog('Producto editado (id :'.$data->id.')');
             $answer = array(
                 "datos" => $request->all(),
@@ -142,12 +124,12 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getAll($category)
+    public function getAll()
     {
         $data = Product::leftJoin('admin_table AS b', 'products.unidad_medida_id', 'b.id')
         ->join('admin_table AS c', 'products.tipo_producto_id', 'c.id')
-        ->select('products.id', 'products.name', 'products.description', 'b.id AS unidad_medida_id', 'b.name AS unidad_medida', 'b.description AS abreviatura', 'products.tipo_producto_id', 'products.category_id', 'c.name AS tipo_producto', 'products.conversion')
-        ->where('products.category_id', $category)
+        ->select('products.id', 'products.name', 'products.description', 'b.id AS unidad_medida_id', 'b.name AS unidad_medida', 'b.description AS abreviatura', 'products.tipo_producto_id', 'c.name AS tipo_producto', 'products.conversion')
+        ->where('products.deleted_at', null)
         ->get();
         return \DataTables::of($data)->make(true);
     }
@@ -157,6 +139,7 @@ class ProductController extends Controller
         $data = DB::table('products as a')
             ->join('admin_table as b', 'a.unidad_medida_id', 'b.id')
             ->select('a.id', 'a.name', 'a.description', 'b.description as unidad_medida')
+            ->where('a.deleted_at', null)
             ->get();
         $answer = array(
             'data' => $data,
@@ -164,27 +147,65 @@ class ProductController extends Controller
         return $answer;
     }
 
-    public function getPresentaciones()
+    public function replaceProducts()
     {
-     return AdminTable::where('table_name', 'presentacion')->get();
-    }
-
-    public function presentacionSeleccionada($id)
-    {
-     $data = DB::table('pivot_producto_presentacion as a')
-     ->select('a.presentacion_id', 'a.tipo_uds_id')
-     ->where('a.producto_id', $id)
-     ->get();
-     $cdi = [];
-     $hcb = [];
-     foreach ($data as $key => $value) {
-      if ($value->tipo_uds_id == 1) {
-       $cdi[] = $value->presentacion_id;
-      }else{
-       $hcb[] = $value->presentacion_id;
-      }
-     }
-     return ['cdi' => $cdi, 'hcb' => $hcb];
+      $data = array(
+            3 => 185,
+            6 => 125,
+            112 => 190,
+            66 => 180,
+            8 => 124,
+            145 => 156,
+            104 => 179,
+            12 => 143,
+            13 => 142,
+            16 => 123,
+            14 => 186,
+            15 => 65,
+            67 => 174,
+            20 => 158,
+            25 => 154,
+            29 => 122,
+            30 => 129,
+            31 => 191,
+            84 => 131,
+            32 => 138,
+            34 => 161,
+            35 => 178,
+            75 => 169,
+            96 => 132,
+            36 => 155,
+            43 => 149,
+            44 => 140,
+            45 => 141,
+            46 => 135,
+            80 => 162,
+            47 => 127,
+            50 => 144,
+            50 => 167,
+            54 => 160,
+            102 => 150,
+            113 => 189,
+            97 => 151,
+            97 => 152,
+            58 => 187,
+            56 => 188,
+            57 => 172,
+            107 => 183,
+            61 => 136,
+            62 => 153
+            );
+        foreach ($data as $key => $value) {
+          echo 'key: ' . $key . ' -> ' . $value . '<br>';
+          // UPDATE `menu_detalle` SET `product_id`= 1 WHERE product_id = 1
+          // DB::table('menu_detalle')
+          //   ->where('product_id', $value)
+          //   ->update(['product_id' => $key]);
+          DB::table('products')
+            ->where('id', $value)
+            ->update(['deleted_at' => '2019-04-17 11:00:00']);
+        }
+        return;
     }
 
 }

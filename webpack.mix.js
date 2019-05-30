@@ -19,7 +19,6 @@ mix.scripts([
 	'resources/js/plugins/datapicker/bootstrap-datepicker.js',
 	'resources/js/plugins/daterangepicker/daterangepicker.js',
 	'resources/js/plugins/sweetalert2/sweetalert2.min.js',
-  'resources/js/plugins/bootstrapToogle/bootstrap-toggle.min.js',
 	], 'public/js/plantilla.js');
 
 mix.styles([
@@ -37,8 +36,6 @@ mix.styles([
 	'resources/css/plugins/ladda/ladda-themeless.min.css',
 	'resources/css/plugins/datapicker/datepicker3.css',
 	'resources/css/plugins/daterangepicker/daterangepicker-bs3.css',
-	'resources/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css',
-  'resources/css/plugins/bootstrapToogle/bootstrap-toggle.min.css',
 	], 'public/css/plantilla.css');
 
 mix.js('resources/js/app.js' , 'public/js');

@@ -28,6 +28,8 @@ function getMenus(type_menu) {
                     var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
                     btns += btn_edit;
                 // }
+                var btn_copy = "<a onclick=\"copy(" + params + ")\" class='btn btn-outline btn-info btn-xs' data-toggle='tooltip' data-placement='top' title='Copiar'><i class='fa fa-copy'></i></a> ";
+                btns += btn_copy;
                 // if (permission_delete) {
                     var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
                     btns += btn_delete;
@@ -64,6 +66,15 @@ function rollBackDelete(id, table) {
     };
     objVue.rollBackDelete(data, table);
 }
+
+function copy(id, menu, cliente_id, cliente, tipo_us_id, tipo_us) {
+  objVue.name_menu = menu;
+  objVue.name_uds = tipo_us;
+  objVue.id_menu_copy = id;
+  $('#modalCopy').modal('show');
+  edit(id, menu, cliente_id, cliente, tipo_us_id, tipo_us)
+}
+
 var objVue = new Vue({
     el: '#menus',
     watch: {
@@ -77,6 +88,10 @@ var objVue = new Vue({
                     this.hcb_menu = true;
                 }
             }
+        },
+        tipo_uds_id: function(val){
+          this.menus_id = null;
+          this.getMenusChage(val);
         }
     },
     mounted: function() {
@@ -115,9 +130,52 @@ var objVue = new Vue({
         age_groups: [],
         editar: 0,
         cdi_menu: true,
-        hcb_menu: false
+        hcb_menu: false,
+        menus: [],
+        menus_id: null,
+        tipo_uds_id: null,
+        id_menu_copy: null,
+        name_menu: null,
+        name_uds: null,
+        loading: false,
+        coping: 'Copiar',
     },
     methods: {
+      copyMenu(){
+        this.loading = true;
+        this.coping = 'Copiando..';
+        let me = this;
+        if(me.menus_id !== null && me.id_menu_copy !== null){
+          axios.get('menus/copyMenu/' + me.menus_id + '/' + me.id_menu_copy,).then(function(response) {
+            if (response.data['code'] == 200) {
+              refreshTable('tbl-menus_detalle');
+              toastr.success('Registros copiados exitosamente');
+            }
+            me.loading = false;
+            me.coping = 'Copiar';
+          }).catch(function(error) {
+            me.loading = false;
+            me.coping = 'Copiar';
+              console.log(error);
+              toastr.warning('Error.');
+              toastr.options.closeButton = true;
+          });
+        }else{
+          toastr.warning('Seleccione todos los campos por favor.');
+          me.loading = false;
+          me.coping = 'Copiar';
+        }
+      },
+      getMenusChage(type_id){
+        let me = this;
+        axios.get('menus/all/' + type_id,).then(function(response) {
+            me.menus = response.data.data;
+        }).catch(function(error) {
+            console.log(error);
+            toastr.warning('Error.');
+            toastr.options.closeButton = true;
+        });
+      },
         resetForm: function() {
             this.id = null;
             this.name = null;
@@ -326,6 +384,7 @@ var objVue = new Vue({
             let me = this;
             $('#tbl-menus_detalle').DataTable({
                 ajax: 'menus/allDetalle/' + this.id,
+                lengthMenu: [[40, 50, 80, 100, 200, -1], [40, 50, 80, 100, 200, "All"]],
                 columns: [{
                     data: 'product',
                     name: 'product'

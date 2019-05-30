@@ -48,13 +48,13 @@ const objVue = new Vue({
             this.errors.clear();
         },
         rollBackDelete: function(data) {
-            axios.get(table_name + '/restaurar/' + data.id).then(response => {
+            axios.get('administracion/' + table_name + '/restaurar/' + data.id).then(response => {
                 toastr.success('Registro restaurado.');
                 refreshTable('tbl-admin_table');
             });
         },
         delete: function(data) {
-            axios.delete(table_name + '/delete/' + data.id).then(response => {
+            axios.delete('administracion/' + table_name + '/delete/' + data.id).then(response => {
                 refreshTable('tbl-admin_table');
                 toastr.success("<div><p>Registro eliminado exitosamente.</p><button type='button' onclick='deshacerEliminar(" + data.id + ")' id='okBtn' class='btn btn-xs btn-danger pull-right'><i class='fa fa-reply'></i> Restaurar</button></div>");
                 toastr.options.closeButton = true;

@@ -162,8 +162,6 @@ return [
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-        Spatie\Backup\BackupServiceProvider::class,
-        BC\Laravel\DropboxDriver\ServiceProvider::class,
 
     ],
 
