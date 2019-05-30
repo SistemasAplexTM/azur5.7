@@ -139,6 +139,13 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ url('administracion/presentacion')}}">
+                            <spam class="fa fa-box">
+                            </spam>
+                            Presentaciones
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ url('administracion/unidad_de_medida')}}">
                             <spam class="fa fa-balance-scale">
                             </spam>
@@ -195,5 +202,5 @@
             </li>
         </ul>
     </div>
-    
+
 </nav>
