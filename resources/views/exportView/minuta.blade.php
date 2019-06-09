@@ -4,7 +4,7 @@
 	<title>{{ $name_uds }}</title>
 </head>
 <body>
-	
+
 	<table border="1" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -31,7 +31,7 @@
 				<th>ENTREGA DE RACIONES -  {{ $name_minuta }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">CALLE 49 No.3GN - 42 BARRIO VIPASA</th>
+				<th colspan="2">AVENIDA 4 NORTE # 35 A 10 - BARRIO PRADOS DEL NORTE</th>
 				<th>DIAS DE ATENCION: </th>
 			</tr>
 			<tr>
@@ -82,8 +82,8 @@
 			<tr><th>C.C. No.</th></tr>
 			<tr><th></th></tr>
 			<tr><th></th></tr>
-			<tr><th>NOMBRE : WILMER JULIAN CASTRO ORTIZ</th></tr>
-			<tr><th>CEDULA: 1143.831.917 de Cali</th></tr>
+			<tr><th>NOMBRE : Sebastián Andrés Rivas Henao</th></tr>
+			<tr><th>CEDULA: 1.107.080.411 de Cali</th></tr>
 			<tr><th>FIRMA:__________________________________</th></tr>
 			<tr><th></th></tr>
 		</tfoot>

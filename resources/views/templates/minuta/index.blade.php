@@ -16,6 +16,12 @@
 
 @section('content')
 <style type="text/css">
+  table.dataTable tbody tr.selected{
+    background-color: #d4e4fb;
+  }
+  .ibox-tools a.btn-success{
+    color: #fff;
+  }
 </style>
     <div class="row" id="minuta">
         <div class="col-lg-12">
@@ -23,7 +29,8 @@
                 <div class="ibox-title">
                     <h5>Registro de minutas</h5>
                     <div class="ibox-tools">
-                        <a class="btn btn-primary" title="Crear minuta" id="btn-crear_minuta"><i class="fa fa-plus"></i> Crear minuta</a>
+                      <a class="btn btn-success" title="Excel proveedores" id="excel"><i class="fa fa-file"></i> Excel</a>
+                      <a class="btn btn-primary" title="Crear minuta" id="btn-crear_minuta"><i class="fa fa-plus"></i> Crear minuta</a>
                     </div>
                 </div>
                 <div class="ibox-content">
@@ -45,7 +52,7 @@
 
                         </tbody>
                     </table>
-                </div>             
+                </div>
             </div>
             </div>
         </div>

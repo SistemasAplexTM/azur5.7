@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Excel;
+use DateTime;
 use App\Documento;
 use App\UnidadServicio;
 use App\Minuta;
 use App\Remanencia;
 use App\Exports\InvoicesExportView;
 use App\Exports\InvoicesExport;
-use Auth;
-use DateTime;
+use App\Exports\ExportProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Excel;
 use \Maatwebsite\Excel\Sheet;
 
 class MinutaController extends Controller
@@ -22,23 +23,13 @@ class MinutaController extends Controller
     private $ano;
     private $pascua_mes;
     private $pascua_dia;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         // $this->assignPermissionsJavascript('menus');
         return view('templates/minuta/index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         /* LLENO EL ARREGLO DE FESTIVOS */
@@ -276,13 +267,6 @@ class MinutaController extends Controller
         ));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Minuta  $Minuta
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         try {
@@ -304,12 +288,6 @@ class MinutaController extends Controller
         }
     }
 
-/**
- * Remove the specified resource from storage.
- *
- * @param  int  $id
- * @return \Illuminate\Http\Response
- */
     public function destroy($id)
     {
         try {
@@ -336,11 +314,6 @@ class MinutaController extends Controller
         return $answer;
     }
 
-/**
- * Obtener todos los registros de la tabla para el datatable
- *
- * @return \Illuminate\Http\Response
- */
     public function getAll()
     {
         DB::statement(DB::raw("SET lc_time_names = 'es_CO';"));
@@ -475,7 +448,11 @@ class MinutaController extends Controller
         return \DataTables::of($data)->make(true);
     }
 
-    public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null, $remanencia = false)
+    /*
+    var $send = Es para la funcion .. define si descarga el pedido o manda
+    los datos a una funcion externa
+    */
+    public function getPedidoCompleto($id_minuta, $product_type = null, $id_uds = null, $name_minuta = null, $remanencia = false, $send = false)
     {
         $title = 'Pedido completo';
         if($remanencia){
@@ -577,22 +554,32 @@ class MinutaController extends Controller
             $title .= ' ' . $uds[0]->tipo_uds;
         }
 
-        Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
-            $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
-        });
-        // return view('exportView/minutaAll', compact('data', 'uds'));
-        if($id_uds != null and $id_uds != 'null'){
-            $title = $uds[0]->name_uds;
-            return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta '.$title.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-        }else{
-            return Excel::download(new InvoicesExport("exportView.minutaAll",
-                array(
-                    'datos' => $data,
-                    'uds' => $uds,
-                    'remanencias' => $remanencias,
-                    'remanencia' => $remanencia
-                )
-            ), $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        if ($send) {
+          return array(
+              'datos' => $data,
+              'uds' => $uds,
+              'remanencias' => $remanencias,
+              'remanencia' => $remanencia
+          );
+        }else {
+          Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
+              $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
+          });
+          // return view('exportView/minutaAll', compact('data', 'uds'));
+          if($id_uds != null and $id_uds != 'null'){
+              $title = $uds[0]->name_uds;
+              return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta '.$title.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+          }else{
+              return Excel::download(new InvoicesExport("exportView.minutaAll",
+                  array(
+                      'datos' => $data,
+                      'uds' => $uds,
+                      'remanencias' => $remanencias,
+                      'remanencia' => $remanencia
+                  )
+              ), $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+          }
+
         }
 
     }
@@ -710,6 +697,35 @@ class MinutaController extends Controller
             'code' => 200,
         );
         return $answer;
+    }
+
+    public function excelProveedores($data)
+    {
+      $ids = explode(',', $data);
+      $minutas = array();
+      for ($i=0; $i < count($ids); $i++) {
+        $minutas[] = $this->getPedidoCompleto($ids[$i],null, null, null, true, true);
+      }
+
+      $menu = array();
+      foreach ($minutas as $key => $value) {
+        foreach ($value['datos'] as $keyv => $val) {
+          if (!in_array($val->MENU, $menu)) {
+              $menu[] = $val->MENU;
+          }
+        }
+      }
+      echo '<pre>';
+      print_r($menu);
+      echo '</pre>';
+
+      exit();
+
+      // Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
+      //     $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
+      // });
+      // return Excel::download(new ExportProvider("exportView.proveedor", $minutas), 'Minuta Proveedor.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+
     }
 
 }

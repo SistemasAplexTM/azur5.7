@@ -20,7 +20,7 @@ $(function () {
 
 $(document).ready(function(){
   $('.ladda-button').ladda( 'bind', { timeout: 5000 } );
-  
+
   $.extend( true, $.fn.dataTable.defaults, {
     "language": {
         "paginate": {
@@ -55,7 +55,7 @@ function eliminar(id,logical){
         id:id,
         logical:logical
     };
-	objVue.delete(data);	
+	objVue.delete(data);
 }
 /*-- Función para pasar el id de jQuery  a vue para deshacer el eliminado --*/
 function deshacerEliminar(id){
@@ -63,7 +63,7 @@ function deshacerEliminar(id){
     {
         id:id
     };
-    objVue.rollBackDelete(data);    
+    objVue.rollBackDelete(data);
 }
 
 /* COMPROBAR SI UN NUMERO ES ENTERO */

@@ -114,4 +114,5 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('minuta/{id_minuta}/getRemanenciasByMinuta/{id_us}', 'MinutaController@getRemanenciasByMinuta');
     Route::delete('minuta/{id_minuta}/eliminarRemanencia/{id}', 'MinutaController@eliminarRemanencia');
     Route::get('minuta/{id_minuta}/restaurarRemanencia/{id}', 'MinutaController@restaurarRemanencia');
+    Route::get('minuta/excelProveedores/{data}', 'MinutaController@excelProveedores');
 });

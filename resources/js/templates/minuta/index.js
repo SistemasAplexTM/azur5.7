@@ -26,7 +26,7 @@ $(document).ready(function() {
     });
 });
 $(window).load(function() {
-    $('#tbl-minuta').DataTable({
+    var table = $('#tbl-minuta').DataTable({
         ajax: 'minuta/all',
         "order": [[ 0, "desc" ]],
         columns: [{
@@ -69,13 +69,26 @@ $(window).load(function() {
             {"targets": [ 1 ], width: 500, }
         ],
     });
+
+    $('#tbl-minuta tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    } );
+
+    $('#excel').click( function () {
+      var tbl_data = table.rows('.selected').data();
+      if(table.rows('.selected').data().length > 0){
+        objVue.excelProveedores(tbl_data, table.rows('.selected').data().length);
+      }else {
+        toastr.warning('Es necesario seleccionar como minimo una fila!');
+      }
+    } );
 });
 
 function workingDays(dateFrom, dateTo) {
   var from = moment(dateFrom, 'DD/MM/YYY'),
     to = moment(dateTo, 'DD/MM/YYY'),
     days = 0;
-    
+
   while (!from.isAfter(to)) {
     // Si no es sabado ni domingo
     if (from.isoWeekday() !== 6 && from.isoWeekday() !== 7) {
@@ -142,8 +155,18 @@ var objVue = new Vue({
         disabled_menu: true,
         minuta_id_print: null,
         remanencia_tipo_prod: false,
+        idsMinutas: []
     },
     methods: {
+        excelProveedores: function(data, length) {
+          let me = this;
+          me.idsMinutas = [];
+          for (var i = 0; i < length; i++) {
+            me.idsMinutas.push(data[i]['id']);
+          }
+          console.log(me.idsMinutas.toString());
+          window.open('minuta/excelProveedores/'+me.idsMinutas.toString(), '_blank')
+        },
         setSelects: function(){
             this.getClientes();
             this.getTipoUnidadServicio();
