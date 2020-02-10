@@ -1,8 +1,11 @@
-$(document).ready(function() {
+$(document).ready(function () {
     //  
 });
-$(window).load(function() {
+$(window).load(function () {
     $('#tbl-clientes').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: true,
         ajax: 'clientes/all',
         columns: [{
             data: 'name',
@@ -18,7 +21,7 @@ $(window).load(function() {
             name: 'phone'
         }, {
             sortable: false,
-            "render": function(data, type, full, meta) {
+            "render": function (data, type, full, meta) {
                 var params = [
                     full.id, "'" + full.name + "'", "'" + full.nit + "'", "'" + full.address + "'", "'" + full.phone + "'"
                 ];
@@ -30,7 +33,7 @@ $(window).load(function() {
     });
 });
 
-function edit(id, name, nit, address,phone) {
+function edit(id, name, nit, address, phone) {
     var data = {
         id: id,
         name: name,
@@ -42,7 +45,7 @@ function edit(id, name, nit, address,phone) {
 }
 var objVue = new Vue({
     el: '#clientes',
-    mounted: function() {
+    mounted: function () {
         const dict = {
             custom: {
                 name: {
@@ -69,7 +72,7 @@ var objVue = new Vue({
         editar: 0
     },
     methods: {
-        resetForm: function() {
+        resetForm: function () {
             this.id = null;
             this.name = null;
             this.nit = null;
@@ -78,21 +81,21 @@ var objVue = new Vue({
             this.editar = 0;
             this.errors.clear();
         },
-        rollBackDelete: function(data) {
+        rollBackDelete: function (data) {
             var urlRestaurar = 'clientes/restaurar/' + data.id;
             axios.get(urlRestaurar).then(response => {
                 toastr.success('Registro restaurado.');
                 refreshTable('tbl-clientes');
             });
         },
-        delete: function(data) {
+        delete: function (data) {
             axios.delete('clientes/' + data.id).then(response => {
                 refreshTable('tbl-clientes');
                 toastr.success("<div><p>Registro eliminado exitosamente.</p><button type='button' onclick='deshacerEliminar(" + data.id + ")' id='okBtn' class='btn btn-xs btn-danger pull-right'><i class='fa fa-reply'></i> Restaurar</button></div>");
                 toastr.options.closeButton = true;
             });
         },
-        store: function() {
+        store: function () {
             this.$validator.validateAll().then((result) => {
                 if (result) {
                     let me = this;
@@ -101,7 +104,7 @@ var objVue = new Vue({
                         'nit': this.nit,
                         'address': this.address,
                         'phone': this.phone,
-                    }).then(function(response) {
+                    }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro creado correctamente.');
                             toastr.options.closeButton = true;
@@ -111,7 +114,7 @@ var objVue = new Vue({
                             toastr.warning(response.data['error']);
                             toastr.options.closeButton = true;
                         }
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         console.log(error);
                         toastr.error("Error. - " + error, {
                             timeOut: 50000
@@ -121,11 +124,11 @@ var objVue = new Vue({
                     console.log(errors);
                     toastr.warning('Error en la validacion');
                 }
-            }).catch(function(error) {
+            }).catch(function (error) {
                 toastr.warning('Error al intentar registrar.');
             });
         },
-        update: function() {
+        update: function () {
             this.$validator.validateAll().then((result) => {
                 if (result) {
                     var me = this;
@@ -134,7 +137,7 @@ var objVue = new Vue({
                         'nit': this.nit,
                         'address': this.address,
                         'phone': this.phone,
-                    }).then(function(response) {
+                    }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro Actualizado correctamente');
                             toastr.options.closeButton = true;
@@ -146,19 +149,19 @@ var objVue = new Vue({
                             toastr.options.closeButton = true;
                             console.log(response.data);
                         }
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         console.log(error);
                         toastr.error("Error. - " + error, {
                             timeOut: 50000
                         });
                     });
                 }
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.log(error);
                 toastr.warning('Error al intentar registrar.');
             });
         },
-        edit: function(data) {
+        edit: function (data) {
             this.id = data['id'];
             this.name = data['name'];
             this.nit = data['nit'];
@@ -167,7 +170,7 @@ var objVue = new Vue({
             this.editar = 1;
             this.mostrar_password = false;
         },
-        cancel: function() {
+        cancel: function () {
             var me = this;
             me.resetForm();
         }

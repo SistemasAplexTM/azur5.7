@@ -9,18 +9,28 @@ use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class ExportProvider implements FromView, WithEvents, WithDrawings
+class ExportProviderFull implements FromView, WithEvents, WithDrawings
 {
     public $view;
     public $data;
+    public $letraUds;
+    public $letraStartTotals;
+    public $letraFinal;
+    public $abc;
 
-    public function __construct($view, $data = "", $dm = false, $provider = false, $type_product = false)
+    public function __construct($view, $data = "", $dm = false, $provider = false, $type_product = false, $abc = false)
     {
-        $this->view  = $view;
-        $this->data  = $data;
-        $this->dm    = $dm;
-        $this->provider    = $provider;
-        $this->type_product    = $type_product;
+        $this->view         = $view;
+        $this->data         = $data;
+        $this->dm           = $dm;
+        $this->provider     = $provider;
+        $this->type_product = $type_product;
+        $this->abc          = $abc;
+        // TOMO LA LETRA FINAL CONTANTO EL TOTAL DE UDS Y SUMANDO 4 AL valor
+        // QUE SON LAS ULTIMAS 4 COLUMNAS DE LOS TOTALES
+        $this->letraFinal = $abc[(count($data['uds'])) + 4];
+        $this->letraUds = $abc[(count($data['uds']))];
+        $this->letraStartTotals = $abc[(count($data['uds'])) + 3];
     }
 
     public function view(): View
@@ -52,19 +62,19 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
     {
         return [
             AfterSheet::class    => function(AfterSheet $event) {
-                $cellRange = 'A1:E150'; // All headers
+                $cellRange = 'A1:'.$this->letraFinal.'150'; // All headers
                 /* ANCHO DE COLUMNA PERSONALIZADO */
                 $event->sheet->getDelegate()->getColumnDimension('A')->setWidth(25);
                 $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(13);
-                $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(15);
-                $event->sheet->getDelegate()->getColumnDimension('D')->setWidth(15);
-                $event->sheet->getDelegate()->getColumnDimension('E')->setWidth(15);
+                for ($i=2; $i < (count($this->data['uds']) + 5) ; $i++) {
+                  $event->sheet->getDelegate()->getColumnDimension($this->abc[$i])->setWidth(15);
+                }
                 /* ALTO DE COLUMNA PERSONALIZADO */
                 $event->sheet->getDelegate()->getRowDimension('6')->setRowHeight(26);
                 $event->sheet->getDelegate()->getRowDimension('7')->setRowHeight(26);
                 /* CENTRAR DATOS DE LA COLUMNA B */
                 $event->sheet->styleCells(
-                    'B12:B100',
+                    'B12:'.$this->letraUds.'100',
                     [
                         'alignment' => array(
                             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -73,7 +83,7 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                 );
                 /* CENTRAR CABECERA DE LA TABLA */
                 $event->sheet->styleCells(
-                    'A11:E11',
+                    'A11:'.$this->letraFinal.'11',
                     [
                         'alignment' => array(
                             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -96,7 +106,7 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                 $event->sheet->getDelegate()->mergeCells('C6:E6');
                 $event->sheet->getDelegate()->mergeCells('C7:E7');
                 $event->sheet->getDelegate()->mergeCells('C8:E8');
-                $event->sheet->getDelegate()->mergeCells('A'.(count($this->data) + 13).':E'.(count($this->data) + 13));
+                $event->sheet->getDelegate()->mergeCells('A'.(count($this->data['menu']) + 13).':E'.(count($this->data['menu']) + 13));
 
                 /* COLOR DE FONDO DE ESTAS CELDAS */
                 $event->sheet->getDelegate()->getStyle('C2:E9')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFFFF');
@@ -158,7 +168,7 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                     ]
                 );
                 $event->sheet->styleCells(
-                    'A'.(count($this->data) + 13).':E'.(count($this->data) + 13),
+                    'A'.(count($this->data['menu']) + 13).':E'.(count($this->data['menu']) + 13),
                     [
                       'font' => [
                           'bold' => true,
@@ -167,7 +177,7 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                     ]
                 );
                 $event->sheet->styleCells(
-                    'A11:E'.(count($this->data) + 11),
+                    'A11:'.$this->letraFinal.''.(count($this->data['menu']) + 11),
                     [
                         'borders' => [
                             'allBorders' => [
@@ -177,25 +187,10 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                         ]
                     ]
                 );
-                $event->sheet->styleCells(
-                    'D'.(count($this->data) + 12).':E'.(count($this->data) + 12),
-                    [
-                      'font' => [
-                          'bold' => true,
-                      ],
-                      'borders' => [
-                          'allBorders' => [
-                              'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                              'color' => ['argb' => '000000'],
-                          ],
-                      ]
-                    ]
-                );
+
+
                 // FORMATO DE MONEDA DESDE E12 HASTA TODO EL DETALLE
-                $event->sheet->getDelegate()->getStyle('D12:E'.(count($this->data) + 11))->getNumberFormat()
-                ->setFormatCode('_-$ * #,##0_-;-$ * #,##0_-;_-$ * "-"_-;_-@_-');
-                // FORMATO DE MONEDA DEL TOTAL
-                $event->sheet->getDelegate()->getStyle('E'.(count($this->data) + 12))->getNumberFormat()
+                $event->sheet->getDelegate()->getStyle($this->letraStartTotals . '12:'.$this->letraFinal.''.(count($this->data['menu']) + 11))->getNumberFormat()
                 ->setFormatCode('_-$ * #,##0_-;-$ * #,##0_-;_-$ * "-"_-;_-@_-');
             },
         ];

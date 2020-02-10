@@ -51,6 +51,9 @@
 			</tr>
 			<tr>
 				<th><div style="border: solid 1px #000;">MENU</div></th>
+				@foreach ($data['uds'] as $val)
+					<th>{{ $val->name_uds }}</th>
+				@endforeach
 				<th>TOTAL PEDIDO</th>
 				<th>UNIDAD MEDIDA</th>
 				<th>VALOR UNITARIO</th>
@@ -58,23 +61,31 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach ($data as $value)
+			@foreach ($data['menu'] as $value)
 				<tr>
-					<td>{{ $value['menu'] }}</td>
-					<td>{{ $value['pedido'] }}</td>
-					<td>{{ $value['unidad_medida'] }}</td>
-					<td>{{ $value['valor'] }}</td>
-					<td>{{ $value['valor_total'] }}</td>
+					<td>{{ $value->MENU }}</td>
+					<?php
+						$tot = 0;
+						$arr = (array)$value;
+					?>
+					@foreach ($data['uds'] as $ud)
+						@if(isset($arr[str_replace(' ', '_', $ud->name_uds)]))
+							<td>{{ $arr[str_replace(' ', '_', $ud->name_uds)] }}</td>
+							<?php $tot += $arr[str_replace(' ', '_', $ud->name_uds)] ?>
+						@else
+							<td></td>
+						@endif
+					@endforeach
+					<td>{{ $tot }}</td>
+					<td>{{ $value->UNIDAD_MEDIDA }}</td>
+					<td>0</td>
+					<td>0</td>
 				</tr>
 			@endforeach
 		</tbody>
 		<tfoot>
 			<tr>
 				<th></th>
-				<th></th>
-				<th></th>
-				<th>TOTAL</th>
-				<th>0</th>
 			</tr>
 			<tr><th>ENTREGAR EN AZUR  </th></tr>
 		</tfoot>

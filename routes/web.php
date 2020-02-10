@@ -25,11 +25,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('logActivity', 'LogActivityController@index')->name('logActivity.index');
     Route::get('logActivity/all', 'LogActivityController@getAll')->name('logActivity.getAll');
     /*--- MODULO USER ---*/
-    // Route::resource('user', 'UserController', ['except' => ['show', 'create', 'edit']]);
-    Route::get('user', 'MenuController@index')->name('users.index')->middleware('permission:users.index');
-    Route::post('user', 'MenuController@store')->name('users.store')->middleware('permission:users.store');
-    Route::put('user', 'MenuController@update')->name('users.update')->middleware('permission:users.update');
-    Route::delete('user', 'MenuController@destroy')->name('users.destroy')->middleware('permission:users.destroy');
+    Route::resource('user', 'UserController', ['except' => ['show', 'create', 'edit']]);
+    // Route::get('user', 'MenuController@index')->name('users.index');
+    // Route::post('user', 'MenuController@store')->name('users.store');
+    // Route::put('user', 'MenuController@update')->name('users.update');
+    // Route::delete('user', 'MenuController@destroy')->name('users.destroy');
 
     Route::post('user/validarUsername', 'UserController@validarUsername');
     Route::post('user/validar', 'UserController@validar');
@@ -38,14 +38,14 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::get('user/getDataSelect/{table}', 'UserController@getDataSelect');
 
     /* ADMIN_TABLE */
-    Route::delete('administracion/{type}/delete/{id}', 'AdminTableController@destroy');
+    // Route::delete('administracion/{type}/delete/{id}', 'AdminTableController@destroy');
     Route::post('administracion/', 'AdminTableController@store');
     Route::put('administracion/update/{type}/{id}', 'AdminTableController@update');
     Route::get('administracion/{type}/all', 'AdminTableController@getAll');
     Route::get('administracion/{type}', 'AdminTableController@index');
     Route::get('administracion/{type}/getDataSelect', 'AdminTableController@getDataSelect');
     Route::get('administracion/{type}/restaurar/{id}', 'AdminTableController@restaurar');
-    Route::get('administracion/{type}/delete/{id}/{logical?}', 'AdminTableController@delete')->name('AdminTable.delete');
+    Route::get('administracion/{type}/delete/{id}/{logical?}', 'AdminTableController@destroy');
 
     /*--- MODULO PRODUCTO ---*/
     Route::resource('product', 'ProductController', ['except' => ['show', 'create', 'edit']]);
@@ -100,6 +100,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tercero/delete/{id}/{logical?}', 'TerceroController@delete')->name('tercero.delete');
     Route::get('tercero/restaurar/{id}', 'TerceroController@restaurar');
     Route::get('tercero/getDataSelect', 'TerceroController@getDataSelect');
+    Route::get('tercero/getByProductType/{produc_type_id}', 'TerceroController@getByProductType');
 
     /*--- MODULO MINUTA ---*/
     Route::resource('minuta', 'MinutaController', ['except' => ['show', 'create']]);
@@ -114,5 +115,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('minuta/{id_minuta}/getRemanenciasByMinuta/{id_us}', 'MinutaController@getRemanenciasByMinuta');
     Route::delete('minuta/{id_minuta}/eliminarRemanencia/{id}', 'MinutaController@eliminarRemanencia');
     Route::get('minuta/{id_minuta}/restaurarRemanencia/{id}', 'MinutaController@restaurarRemanencia');
-    Route::get('minuta/excelProveedores/{data}', 'MinutaController@excelProveedores');
+    Route::get('minuta/excelProveedores/{data}/{name}/{product_type_id}/{provider_id}/{complete?}', 'MinutaController@excelProveedores');
 });
+Route::get('minuta/sqlListMinuta', 'MinutaController@sqlListMinuta');
+Route::get('minuta/minutaJson/{minuta_id}', 'MinutaController@minutaJson');

@@ -18,7 +18,7 @@ class MenuController extends Controller
     public function index()
     {
         // $this->assignPermissionsJavascript('menus');
-        return view('templates/menus');
+        return view('templates/menu/form');
     }
 
     /**
@@ -99,6 +99,7 @@ class MenuController extends Controller
                     $this->AddToLog('Menu detalle eliminado (id :' . $data->id . ')');
                     $answer = array(
                         "code" => 200,
+                        "data" => $data
                     );
                 }
             } else {
@@ -107,10 +108,12 @@ class MenuController extends Controller
                     $this->AddToLog('Menu eliminado (id :' . $data->id . ')');
                     $answer = array(
                         "code" => 200,
+                        "data" => $data
                     );
                 }
             }
-        } catch (Exception $e) {
+            return $answer;
+        } catch (\Exception $e) {
             return $e;
         }
     }
@@ -148,6 +151,7 @@ class MenuController extends Controller
      */
     public function getAll($type)
     {
+       
       if($type == 1){
         $type = 'cdi';
       }else{
@@ -155,6 +159,7 @@ class MenuController extends Controller
           $type = 'hcb';
         }
       }
+      $type = str_replace("_", " ", $type);
         $data = Menu::join('clientes as b', 'menu.cliente_id', 'b.id')
             ->join('admin_table AS c', 'menu.tipo_us_id', 'c.id')
             ->select('menu.id', 'menu.name', 'menu.cliente_id', 'b.name AS cliente', 'menu.tipo_us_id', 'c.name AS tipo_uds')
@@ -168,6 +173,7 @@ class MenuController extends Controller
         $data = DB::table('menu')
             ->select('id', 'name')
             ->where('tipo_us_id', $tipo_us_id)
+            ->where('deleted_at', null)
             ->get();
         $answer = array(
             'data' => $data,
@@ -177,43 +183,99 @@ class MenuController extends Controller
 
     public function getAllDetalle($id_menu)
     {
-        $data = MenuDetalle::join('products AS b', 'menu_detalle.product_id', 'b.id')
-            ->join('admin_table AS c', 'b.unidad_medida_id', 'c.id')
-            ->leftJoin(DB::raw("(SELECT
-                                z.id,
-                                z.menu_detalle_id,
-                                z.grupo_edad_id,
-                                z.cantidad
-                            FROM
-                                pivot_menu_detalle_cantidad AS z
-                            WHERE
-                                z.grupo_edad_id = 24
-                        ) AS d"), 'menu_detalle.id', 'd.menu_detalle_id')
-            ->leftJoin(DB::raw("(SELECT
-                                z.id,
-                                z.menu_detalle_id,
-                                z.grupo_edad_id,
-                                z.cantidad
-                            FROM
-                                pivot_menu_detalle_cantidad AS z
-                            WHERE
-                                z.grupo_edad_id = 25
-                        ) AS e"), 'menu_detalle.id', 'e.menu_detalle_id')
-            ->select(
-                'menu_detalle.id',
-                'menu_detalle.unidad_medida_real AS um_pedido',
-                'b.id AS product_id',
-                'b.name AS product',
-                'c.name AS unidad_medida',
-                'c.description AS unidad_medida_ab',
-                'd.id AS cantidad_1_3_id',
-                'd.cantidad AS cantidad_1_3',
-                'e.id AS cantidad_4_5_id',
-                'e.cantidad AS cantidad_4_5'
-            )
-            ->where('menu_detalle.menu_id', $id_menu)
-            ->get();
+        
+        $grupo_edad = $this->getAgeGroup();
+
+        $selectFields = $this->getSelectFieldsTableDetail($grupo_edad);
+        $join = $this->getJoinTableDetail($grupo_edad);
+        $data =  DB::select(DB::raw(" 
+                    SELECT
+                        `menu_detalle`.`id`,
+                        ge24.id AS ge_id,
+                        `b`.`name` AS `Producto`,
+                        $selectFields
+                        `c`.`description` AS `U.M`,
+                        `menu_detalle`.`unidad_medida_real` AS `um_pedido`,
+                        `b`.`id` AS `product_id`,
+                        `c`.`name` AS `unidad_medida`,
+                        `menu_detalle`.`id` AS detalle 
+                    FROM
+                        `menu_detalle`
+                        INNER JOIN `products` AS `b` ON `menu_detalle`.`product_id` = `b`.`id`
+                        INNER JOIN `admin_table` AS `c` ON `b`.`unidad_medida_id` = `c`.`id`
+                        $join
+                    WHERE
+                        `menu_detalle`.`menu_id` = $id_menu 
+                        AND `menu_detalle`.`deleted_at` IS NULL"
+                ));
+        // DB::connection()->enableQueryLog();
+        // $data = MenuDetalle::join('products AS b', 'menu_detalle.product_id', 'b.id')
+        //     ->join('admin_table AS c', 'b.unidad_medida_id', 'c.id')
+        //     ->leftJoin(DB::raw("(SELECT
+        //                         z.id,
+        //                         z.menu_detalle_id,
+        //                         z.grupo_edad_id,
+        //                         z.cantidad
+        //                     FROM
+        //                         pivot_menu_detalle_cantidad AS z
+        //                     WHERE
+        //                         z.grupo_edad_id = 24
+        //                 ) AS d"), 'menu_detalle.id', 'd.menu_detalle_id')
+        //     ->leftJoin(DB::raw("(SELECT
+        //                         z.id,
+        //                         z.menu_detalle_id,
+        //                         z.grupo_edad_id,
+        //                         z.cantidad
+        //                     FROM
+        //                         pivot_menu_detalle_cantidad AS z
+        //                     WHERE
+        //                         z.grupo_edad_id = 25
+        //                 ) AS e"), 'menu_detalle.id', 'e.menu_detalle_id')
+        //     ->select(
+        //         'menu_detalle.id',
+        //         'menu_detalle.unidad_medida_real AS um_pedido',
+        //         'b.id AS product_id',
+        //         'b.name AS product',
+        //         'c.name AS unidad_medida',
+        //         'c.description AS unidad_medida_ab',
+        //         'd.id AS cantidad_1_3_id',
+        //         'd.cantidad AS cantidad_1_3',
+        //         'e.id AS cantidad_4_5_id',
+        //         'e.cantidad AS cantidad_4_5'
+        //     )
+        //     ->where('menu_detalle.menu_id', $id_menu)
+        //     ->get();
+            // return DB::getQueryLog();
         return \DataTables::of($data)->make(true);
+    }
+
+    public function getSelectFieldsTableDetail($grupo_edad)
+    {
+        $selectFields = '';
+        foreach ($grupo_edad as $key => $value) {
+            $name = str_replace(" ", "_", $value->name);
+            $name2='ge_id';
+            $selectFields .= " `ge$value->id`.`id` AS `id_".$name."`, `ge$value->id`.`cantidad` AS `cant_$name`,";
+        }
+        return $selectFields;
+    }
+    public function getJoinTableDetail($grupo_edad)
+    {
+        $join = '';
+        foreach ($grupo_edad as $key => $value) {
+            $join .= " LEFT JOIN (
+                        SELECT
+                            z.id,
+                            z.menu_detalle_id,
+                            z.grupo_edad_id,
+                            z.cantidad 
+                        FROM
+                            pivot_menu_detalle_cantidad AS z 
+                        WHERE
+                            z.grupo_edad_id = $value->id
+                        ) AS ge$value->id ON `menu_detalle`.`id` = `ge$value->id`.`menu_detalle_id` ";
+        }
+        return $join;
     }
 
     public function addMenuDetail(Request $request)
@@ -222,7 +284,13 @@ class MenuController extends Controller
             ->select('products.id', 'products.conversion', 'b.name AS unidad_medida', 'b.description AS unidad_medida_ab')
             ->where('products.id',  $request->product_id)
             ->first();
-        DB::beginTransaction();
+            $grupo_edad = $this->getAgeGroup();
+            // echo '<pre>';
+            // print_r($grupo_edad);
+            // // echo count($grupo_edad);
+            // echo '</pre>';
+            // exit();
+            DB::beginTransaction();
         try {
             $id = DB::table('menu_detalle')->insertGetId(
                 [
@@ -234,12 +302,13 @@ class MenuController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                 ]
             );
-            for ($i=24; $i < 26; $i++) {
+            
+            for ($i=0; $i < count($grupo_edad); $i++) {
               DB::table('pivot_menu_detalle_cantidad')->insert(
                 [
                   'menu_detalle_id'    => $id,
-                  'grupo_edad_id' => $i,
-                  'cantidad' => ($request->age_group_id == $i) ? $request->cantidad : 0
+                  'grupo_edad_id' => $grupo_edad[$i]->id,
+                  'cantidad' => ($request->age_group_id == $grupo_edad[$i]->id) ? $request->cantidad : 0
                 ]
               );
             }
@@ -378,5 +447,20 @@ class MenuController extends Controller
           );
           return $answer;
       }
+    }
+
+    public function getAgeGroup()
+    {
+        return DB::select(DB::raw("
+            SELECT
+            a.id,
+            a.table_name,
+            a.`name`,
+            a.description
+            FROM
+            admin_table AS a
+            WHERE
+            a.deleted_at IS NULL AND
+            a.table_name = 'grupo_edad'"));
     }
 }

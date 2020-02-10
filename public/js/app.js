@@ -96866,7 +96866,7 @@ exports = module.exports = __webpack_require__(74)(false);
 
 
 // module
-exports.push([module.i, "\n.exclusion{\n    background-color: yellow !important;\n}\n", ""]);
+exports.push([module.i, "\n.exclusion {\r\n  background-color: yellow !important;\n}\r\n", ""]);
 
 // exports
 
@@ -97404,290 +97404,430 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        minuta: {
-            type: Object,
-            required: true
-        },
-        menus: {
-            type: Array,
-            required: true
-        },
-        unidades: {
-            type: Array,
-            required: true
-        },
-        name_minuta: {
-            type: String,
-            required: false
-        }
+  props: {
+    minuta: {
+      type: Object,
+      required: true
     },
-    mounted: function mounted() {
-        var dict = {
-            custom: {
-                product_id: {
-                    required: 'Este campo es obligatorio.'
-                },
-                cantidad: {
-                    required: 'Este campo es obligatorio.'
-                }
-            }
-        };
-        this.$validator.localize('es', dict);
+    menus: {
+      type: Array,
+      required: true
     },
-    data: function data() {
-        return {
-            coverage_1_3: null,
-            coverage_4_5: null,
-            name_unidad: null,
-            produc_type_id: null,
-            produc_types: [],
-            unidad_medida_id: null,
-            unidad_medidas: [],
-            product_id: null,
-            products: [],
-            cantidad: 0,
-            uds_id: null,
-            descripcion: null,
-            remanencia_tipo_prod: false
-        };
+    unidades: {
+      type: Array,
+      required: true
     },
-
-    methods: {
-        imprimirPedido: function imprimirPedido() {
-            window.open('../' + this.minuta.id + '/getPedidoCompleto/' + this.produc_type_id.id + '/' + null + '/' + null + '/' + this.remanencia_tipo_prod, '_blank');
-        },
-        getProductType: function getProductType() {
-            var me = this;
-            axios.get('../../administracion/tipo_producto/getDataSelect').then(function (response) {
-                me.produc_types = response.data.data;
-            }).catch(function (error) {
-                console.log(error);
-                toastr.warning('Error.');
-                toastr.options.closeButton = true;
-            });
-        },
-        viewMenu: function viewMenu(unidad) {
-            this.coverage_1_3 = unidad.coverage_1_3;
-            this.coverage_4_5 = unidad.coverage_4_5;
-            this.name_unidad = unidad.name;
-            if ($.fn.DataTable.isDataTable('#tbl-cobertura')) {
-                $('#tbl-cobertura tbody').empty();
-                $('#tbl-cobertura').dataTable().fnDestroy();
-            }
-            this.datatable(unidad.id);
-            this.uds_id = unidad.id;
-        },
-        getUnidadMedida: function getUnidadMedida() {
-            var me = this;
-            axios.get('../../administracion/unidad_de_medida/getDataSelect').then(function (response) {
-                me.unidad_medidas = response.data.data;
-            }).catch(function (error) {
-                console.log(error);
-                toastr.warning('Error.');
-                toastr.options.closeButton = true;
-            });
-        },
-        getProductos: function getProductos() {
-            var me = this;
-            axios.get('getProductsMinuta/' + this.uds_id).then(function (response) {
-                me.products = response.data.data;
-            }).catch(function (error) {
-                console.log(error);
-                toastr.warning('Error.');
-                toastr.options.closeButton = true;
-            });
-        },
-        setUnidadMedida: function setUnidadMedida(val) {
-            this.product_id = val;
-            if (val != null) {
-                $('#unidad_medida').html(val.um);
-            }
-        },
-        getDataRemanecnias: function getDataRemanecnias() {
-            this.getProductos();
-            this.datatableRemanencias();
-            // this.getUnidadMedida();
-        },
-        saveRemanencia: function saveRemanencia() {
-            var _this = this;
-
-            var me = this;
-            this.$validator.validateAll(['product_id', 'cantidad']).then(function (result) {
-                if (result) {
-                    axios.post('saveRemanencia', {
-                        'minuta_id': _this.minuta.id,
-                        'unidad_servicio_id': _this.uds_id,
-                        'product_id': _this.product_id.id,
-                        'cantidad': _this.cantidad,
-                        'descripcion': _this.descripcion
-                    }).then(function (response) {
-                        if (response.data['code'] == 200) {
-                            toastr.success('Registro creado correctamente.');
-                            toastr.options.closeButton = true;
-                            refreshTable('tbl-remanencias');
-                            me.cantidad = 0;
-                            me.descripcion = null;
-                        } else {
-                            toastr.warning(response.data['error']);
-                            toastr.options.closeButton = true;
-                        }
-                    }).catch(function (error) {
-                        console.log(error);
-                        toastr.error("Error. - " + error, {
-                            timeOut: 50000
-                        });
-                    });
-                } else {
-                    console.log(errors);
-                    toastr.warning('Error en la validacion');
-                }
-            }).catch(function (error) {
-                console.log(error);
-                toastr.warning('Error al intentar registrar.');
-            });
-        },
-        datatableRemanencias: function datatableRemanencias() {
-            if ($.fn.DataTable.isDataTable('#tbl-remanencias')) {
-                $('#tbl-remanencias tbody').empty();
-                $('#tbl-remanencias').dataTable().fnDestroy();
-            }
-            $('#tbl-remanencias').DataTable({
-                ajax: 'getRemanenciasByMinuta/' + this.uds_id,
-                columns: [{
-                    data: 'name',
-                    name: 'name'
-                }, {
-                    data: 'cantidad',
-                    name: 'cantidad'
-                }, {
-                    data: 'um',
-                    name: 'um'
-                }, {
-                    sortable: false,
-                    "render": function render(data, type, full, meta) {
-                        var btn_delete = " <a onclick=\"eliminarRemanencia(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
-                        return btn_delete;
-                    }
-                }]
-            });
-        },
-
-        datatable: function datatable(id_us) {
-            var me = this;
-            $('#tbl-cobertura').DataTable({
-                dom: "<'row'<'col-sm-9 text-right'f><'col-sm-3 text-right'B><'floatright'>rtip>",
-                buttons: [{
-                    extend: 'print',
-                    text: '<i class="fa fa-retweet" aria-hidden="true"></i> Remanencias',
-                    titleAttr: 'Imprimir',
-                    action: function action(e, dt, node, config) {
-                        $('#modalRemanencias').modal('show');
-                        me.getDataRemanecnias();
-                    }
-                }, {
-                    extend: 'collection',
-                    text: '<i class="fa fa-print" aria-hidden="true"></i> Imprimir <i class="fa fa-angle-double-down" aria-hidden="true"></i>',
-                    buttons: [{
-                        text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido completo',
-                        action: function action(e, dt, node, config) {
-                            window.open("../" + me.minuta.id + "/getPedidoCompleto");
-                        }
-                    }, {
-                        text: '<i class="fa fa-print" aria-hidden="true"></i> Completo con remanencias',
-                        action: function action(e, dt, node, config) {
-                            window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + null + "/" + null + "/" + true);
-                        }
-                    }, {
-                        text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
-                        action: function action(e, dt, node, config) {
-                            window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + id_us + "/" + me.name_minuta);
-                        }
-                    }, {
-                        text: '<i class="fa fa-tasks"></i> Por tipo de producto',
-                        action: function action(e, dt, node, config) {
-                            me.getProductType();
-                            $('#modalTipoProducto').modal('show');
-                        }
-                    }]
-                }],
-                "paging": false,
-                ajax: 'getMenusUnidadesByMinuta/' + id_us,
-                columns: [{
-                    data: 'producto',
-                    name: 'producto'
-                }, {
-                    data: '1',
-                    name: '1'
-                }, {
-                    data: '2',
-                    name: '2'
-                }, {
-                    data: '3',
-                    name: '3'
-                }, {
-                    data: '4',
-                    name: '4'
-                }, {
-                    data: '5',
-                    name: '5'
-                }, {
-                    data: 'st-1',
-                    name: 'st-1'
-                }, {
-                    data: '6',
-                    name: '6'
-                }, {
-                    data: '7',
-                    name: '7'
-                }, {
-                    data: '8',
-                    name: '8'
-                }, {
-                    data: '9',
-                    name: '9'
-                }, {
-                    data: '10',
-                    name: '10'
-                }, {
-                    data: 'st-2',
-                    name: 'st-2'
-                }, {
-                    data: 'st-3',
-                    name: 'st-3'
-                }, {
-                    data: 'st-4',
-                    name: 'st-4'
-                }, {
-                    data: 'st-5',
-                    name: 'st-5'
-                }, {
-                    data: 'st-6',
-                    name: 'st-6'
-                }, {
-                    data: 'unidad_medida_real',
-                    name: 'unidad_medida_real'
-                }],
-                'columnDefs': [{ className: "", "targets": [0], width: 200 }],
-                'rowCallback': function rowCallback(row, data, index) {
-                    $(row).find('td:eq(6)').css('color', 'navy').css('font-weight', 'bold').css('font-size', '15px').css('border-color', 'blue');
-                    $(row).find('td:eq(12)').css('color', 'orange').css('font-weight', 'bold').css('font-size', '15px').css('border-color', 'orange');
-
-                    $(row).find('td:eq(13)').css('color', 'navy').css('font-weight', 'bold').css('font-size', '15px');
-                    $(row).find('td:eq(14)').css('color', 'orange').css('font-weight', 'bold').css('font-size', '15px');
-
-                    $(row).find('td:eq(15)').css('color', 'black').css('font-weight', 'bold').css('font-size', '15px').css('background-color', 'rgb(209, 243, 209)');
-                    $(row).find('td:eq(16)').css('color', 'black').css('font-weight', 'bold').css('font-size', '15px').css('background-color', 'rgb(209, 243, 209)');
-                    $(row).find('td:eq(17)').css('color', 'black').css('font-weight', 'bold').css('font-size', '15px').css('background-color', 'rgb(209, 243, 209)');
-                    // if(data[2].toUpperCase() == 'EE'){
-                    //     $(row).find('td:eq(2)').css('color', 'blue');
-                    // }
-                }
-            });
-        }
+    name_minuta: {
+      type: String,
+      required: false
     }
+  },
+  mounted: function mounted() {
+    var dict = {
+      custom: {
+        product_id: {
+          required: "Este campo es obligatorio."
+        },
+        cantidad: {
+          required: "Este campo es obligatorio."
+        }
+      }
+    };
+    this.$validator.localize("es", dict);
+  },
+  data: function data() {
+    return {
+      coverage_1_3: null,
+      coverage_4_5: null,
+      name_unidad: null,
+      produc_type_id: null,
+      produc_types: [],
+      unidad_medida_id: null,
+      unidad_medidas: [],
+      product_id: null,
+      products: [],
+      cantidad: 0,
+      uds_id: null,
+      descripcion: null,
+      remanencia_tipo_prod: false
+    };
+  },
+
+  methods: {
+    imprimirPedido: function imprimirPedido() {
+      window.open("../" + this.minuta.id + "/getPedidoCompleto/" + this.produc_type_id.id + "/" + null + "/" + null + "/" + this.remanencia_tipo_prod, "_blank");
+    },
+    getProductType: function getProductType() {
+      var me = this;
+      axios.get("../../administracion/tipo_producto/getDataSelect").then(function (response) {
+        me.produc_types = response.data.data;
+      }).catch(function (error) {
+        console.log(error);
+        toastr.warning("Error.");
+        toastr.options.closeButton = true;
+      });
+    },
+    viewMenu: function viewMenu(unidad) {
+      this.coverage_1_3 = unidad.coverage_1_3;
+      this.coverage_4_5 = unidad.coverage_4_5;
+      this.name_unidad = unidad.name;
+      if ($.fn.DataTable.isDataTable("#tbl-cobertura")) {
+        $("#tbl-cobertura tbody").empty();
+        $("#tbl-cobertura").dataTable().fnDestroy();
+      }
+      this.datatable(unidad.id);
+      this.uds_id = unidad.id;
+    },
+    getUnidadMedida: function getUnidadMedida() {
+      var me = this;
+      axios.get("../../administracion/unidad_de_medida/getDataSelect").then(function (response) {
+        me.unidad_medidas = response.data.data;
+      }).catch(function (error) {
+        console.log(error);
+        toastr.warning("Error.");
+        toastr.options.closeButton = true;
+      });
+    },
+    getProductos: function getProductos() {
+      var me = this;
+      axios.get("getProductsMinuta/" + this.uds_id).then(function (response) {
+        me.products = response.data.data;
+      }).catch(function (error) {
+        console.log(error);
+        toastr.warning("Error.");
+        toastr.options.closeButton = true;
+      });
+    },
+    setUnidadMedida: function setUnidadMedida(val) {
+      this.product_id = val;
+      if (val != null) {
+        $("#unidad_medida").html(val.um);
+      }
+    },
+    getDataRemanecnias: function getDataRemanecnias() {
+      this.getProductos();
+      this.datatableRemanencias();
+      // this.getUnidadMedida();
+    },
+    saveRemanencia: function saveRemanencia() {
+      var _this = this;
+
+      var me = this;
+      this.$validator.validateAll(["product_id", "cantidad"]).then(function (result) {
+        if (result) {
+          axios.post("saveRemanencia", {
+            minuta_id: _this.minuta.id,
+            unidad_servicio_id: _this.uds_id,
+            product_id: _this.product_id.id,
+            cantidad: _this.cantidad,
+            descripcion: _this.descripcion
+          }).then(function (response) {
+            if (response.data["code"] == 200) {
+              toastr.success("Registro creado correctamente.");
+              toastr.options.closeButton = true;
+              refreshTable("tbl-remanencias");
+              me.cantidad = 0;
+              me.descripcion = null;
+            } else {
+              toastr.warning(response.data["error"]);
+              toastr.options.closeButton = true;
+            }
+          }).catch(function (error) {
+            console.log(error);
+            toastr.error("Error. - " + error, {
+              timeOut: 50000
+            });
+          });
+        } else {
+          console.log(errors);
+          toastr.warning("Error en la validacion");
+        }
+      }).catch(function (error) {
+        console.log(error);
+        toastr.warning("Error al intentar registrar.");
+      });
+    },
+    datatableRemanencias: function datatableRemanencias() {
+      if ($.fn.DataTable.isDataTable("#tbl-remanencias")) {
+        $("#tbl-remanencias tbody").empty();
+        $("#tbl-remanencias").dataTable().fnDestroy();
+      }
+      $("#tbl-remanencias").DataTable({
+        processing: true,
+        serverSide: true,
+        searching: true,
+        ajax: "getRemanenciasByMinuta/" + this.uds_id,
+        columns: [{
+          data: "name",
+          name: "name"
+        }, {
+          data: "cantidad",
+          name: "cantidad"
+        }, {
+          data: "um",
+          name: "um"
+        }, {
+          sortable: false,
+          render: function render(data, type, full, meta) {
+            var btn_delete = ' <a onclick="eliminarRemanencia(' + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
+            return btn_delete;
+          }
+        }]
+      });
+    },
+
+    datatable: function datatable(id_us) {
+      var me = this;
+      $("#tbl-cobertura").DataTable({
+        processing: true,
+        serverSide: true,
+        searching: true,
+        dom: "<'row'<'col-sm-9 text-right'f><'col-sm-3 text-right'B><'floatright'>rtip>",
+        buttons: [{
+          extend: "print",
+          text: '<i class="fa fa-retweet" aria-hidden="true"></i> Remanencias',
+          titleAttr: "Imprimir",
+          action: function action(e, dt, node, config) {
+            $("#modalRemanencias").modal("show");
+            me.getDataRemanecnias();
+          }
+        }, {
+          extend: "collection",
+          text: '<i class="fa fa-print" aria-hidden="true"></i> Imprimir <i class="fa fa-angle-double-down" aria-hidden="true"></i>',
+          buttons: [{
+            text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido completo',
+            action: function action(e, dt, node, config) {
+              window.open("../" + me.minuta.id + "/getPedidoCompleto");
+            }
+          }, {
+            text: '<i class="fa fa-print" aria-hidden="true"></i> Completo con remanencias',
+            action: function action(e, dt, node, config) {
+              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + null + "/" + null + "/" + true);
+            }
+          }, {
+            text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
+            action: function action(e, dt, node, config) {
+              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + id_us + "/" + me.name_minuta);
+            }
+          }, {
+            text: '<i class="fa fa-tasks"></i> Por tipo de producto',
+            action: function action(e, dt, node, config) {
+              me.getProductType();
+              $("#modalTipoProducto").modal("show");
+            }
+          }]
+        }],
+        paging: false,
+        ajax: "getMenusUnidadesByMinuta/" + id_us,
+        columns: [{
+          data: "producto",
+          name: "producto"
+        }, {
+          data: "1",
+          name: "1"
+        }, {
+          data: "2",
+          name: "2"
+        }, {
+          data: "3",
+          name: "3"
+        }, {
+          data: "4",
+          name: "4"
+        }, {
+          data: "5",
+          name: "5"
+        }, {
+          data: "st-1",
+          name: "st-1"
+        }, {
+          data: "6",
+          name: "6"
+        }, {
+          data: "7",
+          name: "7"
+        }, {
+          data: "8",
+          name: "8"
+        }, {
+          data: "9",
+          name: "9"
+        }, {
+          data: "10",
+          name: "10"
+        }, {
+          data: "st-2",
+          name: "st-2"
+        }, {
+          data: "st-3",
+          name: "st-3"
+        }, {
+          data: "st-4",
+          name: "st-4"
+        }, {
+          data: "st-5",
+          name: "st-5"
+        }, {
+          data: "st-6",
+          name: "st-6"
+        }, {
+          data: "unidad_medida_real",
+          name: "unidad_medida_real"
+        }],
+        columnDefs: [{ className: "", targets: [0], width: 200 }],
+        rowCallback: function rowCallback(row, data, index) {
+          $(row).find("td:eq(6)").css("color", "navy").css("font-weight", "bold").css("font-size", "15px").css("border-color", "blue");
+          $(row).find("td:eq(12)").css("color", "orange").css("font-weight", "bold").css("font-size", "15px").css("border-color", "orange");
+
+          $(row).find("td:eq(13)").css("color", "navy").css("font-weight", "bold").css("font-size", "15px");
+          $(row).find("td:eq(14)").css("color", "orange").css("font-weight", "bold").css("font-size", "15px");
+
+          $(row).find("td:eq(15)").css("color", "black").css("font-weight", "bold").css("font-size", "15px").css("background-color", "rgb(209, 243, 209)");
+          $(row).find("td:eq(16)").css("color", "black").css("font-weight", "bold").css("font-size", "15px").css("background-color", "rgb(209, 243, 209)");
+          $(row).find("td:eq(17)").css("color", "black").css("font-weight", "bold").css("font-size", "15px").css("background-color", "rgb(209, 243, 209)");
+          // if(data[2].toUpperCase() == 'EE'){
+          //     $(row).find('td:eq(2)').css('color', 'blue');
+          // }
+        }
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -97716,7 +97856,7 @@ var render = function() {
           },
           [
             _c("i", { staticClass: "fa fa-home" }),
-            _vm._v(" " + _vm._s(unidad.name))
+            _vm._v("\n      " + _vm._s(unidad.name) + "\n    ")
           ]
         )
       })
@@ -97740,7 +97880,11 @@ var render = function() {
                   [
                     _c("h3", [
                       _c("i", { staticClass: "fa fa-home" }),
-                      _vm._v(" " + _vm._s(_vm.name_unidad))
+                      _vm._v(
+                        "\n                " +
+                          _vm._s(_vm.name_unidad) +
+                          "\n              "
+                      )
                     ])
                   ]
                 )
@@ -97920,21 +98064,29 @@ var render = function() {
                             [_vm._v("Tipo de proucto:")]
                           ),
                           _vm._v(" "),
-                          _c("v-select", {
-                            attrs: {
-                              name: "produc_type_id",
-                              label: "name",
-                              options: _vm.produc_types,
-                              placeholder: "Tipo"
-                            },
-                            model: {
-                              value: _vm.produc_type_id,
-                              callback: function($$v) {
-                                _vm.produc_type_id = $$v
+                          _c(
+                            "el-select",
+                            {
+                              attrs: {
+                                filterable: "",
+                                placeholder: "Tipos de producto",
+                                "value-key": "id"
                               },
-                              expression: "produc_type_id"
-                            }
-                          }),
+                              model: {
+                                value: _vm.produc_type_id,
+                                callback: function($$v) {
+                                  _vm.produc_type_id = $$v
+                                },
+                                expression: "produc_type_id"
+                              }
+                            },
+                            _vm._l(_vm.produc_types, function(item) {
+                              return _c("el-option", {
+                                key: item.id,
+                                attrs: { label: item.name, value: item }
+                              })
+                            })
+                          ),
                           _vm._v(" "),
                           _c("small", { staticClass: "help-block" }, [
                             _vm._v(_vm._s(_vm.errors.first("produc_type_id")))
@@ -98033,7 +98185,10 @@ var render = function() {
                     }
                   }
                 },
-                [_c("i", { staticClass: "fa fa-save" }), _vm._v(" Imprimir")]
+                [
+                  _c("i", { staticClass: "fa fa-save" }),
+                  _vm._v(" Imprimir\n          ")
+                ]
               )
             ])
           ])
@@ -98064,7 +98219,11 @@ var render = function() {
                 { staticClass: "modal-title", attrs: { id: "myModalLabel" } },
                 [
                   _c("i", { staticClass: "fa fa-retweet" }),
-                  _vm._v(" Remanecnias de " + _vm._s(_vm.name_unidad))
+                  _vm._v(
+                    "\n            Remanecnias de " +
+                      _vm._s(_vm.name_unidad) +
+                      "\n          "
+                  )
                 ]
               )
             ]),
@@ -98100,31 +98259,39 @@ var render = function() {
                             [_vm._v("Producto:")]
                           ),
                           _vm._v(" "),
-                          _c("v-select", {
-                            directives: [
-                              {
-                                name: "validate",
-                                rawName: "v-validate.disable",
-                                value: "required",
-                                expression: "'required'",
-                                modifiers: { disable: true }
-                              }
-                            ],
-                            attrs: {
-                              name: "product_id",
-                              placeholder: "Producto",
-                              label: "name",
-                              options: _vm.products,
-                              "on-change": _vm.setUnidadMedida
-                            },
-                            model: {
-                              value: _vm.product_id,
-                              callback: function($$v) {
-                                _vm.product_id = $$v
+                          _c(
+                            "el-select",
+                            {
+                              directives: [
+                                {
+                                  name: "validate",
+                                  rawName: "v-validate.disable",
+                                  value: "required",
+                                  expression: "'required'",
+                                  modifiers: { disable: true }
+                                }
+                              ],
+                              attrs: {
+                                filterable: "",
+                                placeholder: "Productos",
+                                "value-key": "id"
                               },
-                              expression: "product_id"
-                            }
-                          }),
+                              on: { change: _vm.setUnidadMedida },
+                              model: {
+                                value: _vm.product_id,
+                                callback: function($$v) {
+                                  _vm.product_id = $$v
+                                },
+                                expression: "product_id"
+                              }
+                            },
+                            _vm._l(_vm.products, function(item) {
+                              return _c("el-option", {
+                                key: item.id,
+                                attrs: { label: item.name, value: item }
+                              })
+                            })
+                          ),
                           _vm._v(" "),
                           _c("small", { staticClass: "help-block" }, [
                             _vm._v(_vm._s(_vm.errors.first("product_id")))
@@ -98266,7 +98433,7 @@ var render = function() {
                           },
                           [
                             _c("i", { staticClass: "fa fa-save" }),
-                            _vm._v(" Guardar")
+                            _vm._v(" Guardar\n                  ")
                           ]
                         )
                       ])
@@ -98327,13 +98494,14 @@ var staticRenderFns = [
         },
         [
           _c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")]),
+          _vm._v(" "),
           _c("span", { staticClass: "sr-only" }, [_vm._v("Close")])
         ]
       ),
       _vm._v(" "),
       _c("h4", { staticClass: "modal-title", attrs: { id: "myModalLabel" } }, [
         _c("i", { staticClass: "fa fa-tasks" }),
-        _vm._v(" Imprimir pedido por tipo de producto")
+        _vm._v(" Imprimir pedido por tipo de producto\n          ")
       ])
     ])
   },
@@ -98347,7 +98515,7 @@ var staticRenderFns = [
         staticClass: "btn btn-default",
         attrs: { type: "button", "data-dismiss": "modal" }
       },
-      [_c("i", { staticClass: "fa fa-close" }), _vm._v(" Cerrar")]
+      [_c("i", { staticClass: "fa fa-close" }), _vm._v(" Cerrar\n          ")]
     )
   },
   function() {
@@ -98362,6 +98530,7 @@ var staticRenderFns = [
       },
       [
         _c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")]),
+        _vm._v(" "),
         _c("span", { staticClass: "sr-only" }, [_vm._v("Close")])
       ]
     )
@@ -98409,7 +98578,7 @@ var staticRenderFns = [
           staticClass: "btn btn-default",
           attrs: { type: "button", "data-dismiss": "modal" }
         },
-        [_c("i", { staticClass: "fa fa-close" }), _vm._v(" Cerrar")]
+        [_c("i", { staticClass: "fa fa-close" }), _vm._v(" Cerrar\n          ")]
       )
     ])
   }

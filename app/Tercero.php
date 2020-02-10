@@ -10,7 +10,7 @@ class Tercero extends Model
     use SoftDeletes;
     public $table = "terceros";
     protected $dates = ['deleted_at'];
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,8 +18,10 @@ class Tercero extends Model
      */
     protected $fillable = [
         'id',
-        'name', 
-        'phone', 
+        'document_nit',
+        'name',
+        'address',
+        'phone',
         'email'
     ];
 }

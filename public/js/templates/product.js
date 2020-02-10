@@ -1,8 +1,11 @@
-$(document).ready(function() {
+$(document).ready(function () {
     //  
 });
-$(window).load(function() {
+$(window).load(function () {
     $('#tbl-product').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: true,
         ajax: 'product/all',
         columns: [{
             data: 'name',
@@ -18,7 +21,7 @@ $(window).load(function() {
             name: 'tipo_producto'
         }, {
             sortable: false,
-            "render": function(data, type, full, meta) {
+            "render": function (data, type, full, meta) {
                 var params = [
                     full.id, "'" + full.name + "'", "'" + full.description + "'", full.unidad_medida_id, "'" + full.unidad_medida + "'", full.tipo_producto_id, "'" + full.tipo_producto + "'", full.conversion
                 ];
@@ -45,7 +48,7 @@ function edit(id, name, description, unidad_medida_id, unidad_medida, tipo_produ
 }
 var objVue = new Vue({
     el: '#product',
-    mounted: function() {
+    mounted: function () {
         this.getUnidadMedida();
         this.getTipoProducto();
         const dict = {
@@ -77,7 +80,7 @@ var objVue = new Vue({
         editar: 0
     },
     methods: {
-        resetForm: function() {
+        resetForm: function () {
             this.id = null;
             this.name = null;
             this.description = null;
@@ -87,21 +90,21 @@ var objVue = new Vue({
             this.editar = 0;
             this.errors.clear();
         },
-        rollBackDelete: function(data) {
+        rollBackDelete: function (data) {
             var urlRestaurar = 'product/restaurar/' + data.id;
             axios.get(urlRestaurar).then(response => {
                 toastr.success('Registro restaurado.');
                 refreshTable('tbl-product');
             });
         },
-        delete: function(data) {
+        delete: function (data) {
             axios.delete('product/' + data.id).then(response => {
                 refreshTable('tbl-product');
                 toastr.success("<div><p>Registro eliminado exitosamente.</p><button type='button' onclick='deshacerEliminar(" + data.id + ")' id='okBtn' class='btn btn-xs btn-danger pull-right'><i class='fa fa-reply'></i> Restaurar</button></div>");
                 toastr.options.closeButton = true;
             });
         },
-        store: function() {
+        store: function () {
             this.$validator.validateAll().then((result) => {
                 if (result) {
                     let me = this;
@@ -111,7 +114,7 @@ var objVue = new Vue({
                         'conversion': this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
-                    }).then(function(response) {
+                    }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro creado correctamente.');
                             toastr.options.closeButton = true;
@@ -121,7 +124,7 @@ var objVue = new Vue({
                             toastr.warning(response.data['error']);
                             toastr.options.closeButton = true;
                         }
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         console.log(error);
                         toastr.error("Error. - " + error, {
                             timeOut: 50000
@@ -131,11 +134,11 @@ var objVue = new Vue({
                     console.log(errors);
                     toastr.warning('Error en la validacion');
                 }
-            }).catch(function(error) {
+            }).catch(function (error) {
                 toastr.warning('Error al intentar registrar.');
             });
         },
-        update: function() {
+        update: function () {
             this.$validator.validateAll().then((result) => {
                 if (result) {
                     var me = this;
@@ -145,7 +148,7 @@ var objVue = new Vue({
                         'conversion': this.conversion,
                         'unidad_medida_id': this.unidad_medida_id.id,
                         'tipo_producto_id': this.tipo_producto_id.id,
-                    }).then(function(response) {
+                    }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro Actualizado correctamente');
                             toastr.options.closeButton = true;
@@ -157,24 +160,24 @@ var objVue = new Vue({
                             toastr.options.closeButton = true;
                             console.log(response.data);
                         }
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         console.log(error);
                         toastr.error("Error. - " + error, {
                             timeOut: 50000
                         });
                     });
                 }
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.log(error);
                 toastr.warning('Error al intentar registrar.');
             });
         },
-        edit: function(data) {
+        edit: function (data) {
             this.id = data['id'];
             this.name = data['name'];
             this.description = data['description'];
             this.conversion = data['conversion'];
-            if(data['description'] == 'null'){
+            if (data['description'] == 'null') {
                 this.description = null;
             }
             this.unidad_medida_id = {
@@ -188,25 +191,25 @@ var objVue = new Vue({
             this.editar = 1;
             this.mostrar_password = false;
         },
-        cancel: function() {
+        cancel: function () {
             var me = this;
             me.resetForm();
         },
-        getUnidadMedida: function() {
+        getUnidadMedida: function () {
             let me = this;
-            axios.get('administracion/unidad_de_medida/getDataSelect').then(function(response) {
+            axios.get('administracion/unidad_de_medida/getDataSelect').then(function (response) {
                 me.unidad_medidas = response.data.data;
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.log(error);
                 toastr.warning('Error.');
                 toastr.options.closeButton = true;
             });
         },
-        getTipoProducto: function() {
+        getTipoProducto: function () {
             let me = this;
-            axios.get('administracion/tipo_producto/getDataSelect').then(function(response) {
+            axios.get('administracion/tipo_producto/getDataSelect').then(function (response) {
                 me.tipo_producto = response.data.data;
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.log(error);
                 toastr.warning('Error.');
                 toastr.options.closeButton = true;

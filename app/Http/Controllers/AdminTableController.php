@@ -81,7 +81,7 @@ class AdminTableController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($type, $id, $logical = false)
     {
         try {
             $data = AdminTable::findOrFail($id);
@@ -101,11 +101,11 @@ class AdminTableController extends Controller
         $data = AdminTable::where('table_name', $table)->get();
         return DataTables::of($data)->make(true);
     }
-    
+
     public function getDataSelect($table)
     {
         $data   = AdminTable::select('id','name', 'description')
-        ->where('table_name', $table)->get();
+        ->where('table_name', $table)->orderBy('name', 'ASC')->get();
         return array(
             "code" => 200,
             "data" => $data

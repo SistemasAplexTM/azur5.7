@@ -140,4 +140,19 @@ class TerceroController extends Controller
         );
         return $answer;
     }
+
+    public function getByProductType($produc_type_id)
+    {
+      $data = DB::table('tercero_tipo_producto_pivot as a')
+      ->join('terceros AS b', 'b.id', 'a.tercero_id')
+      ->join('admin_table AS c', 'c.id', 'a.tipo_producto_id')
+      ->select('b.id', 'b.name')
+      ->where([
+        ['a.tipo_producto_id', $produc_type_id],
+        ['a.deleted_at', null]
+      ])
+      ->groupBy('b.id', 'b.name')
+      ->get();
+      return $data;
+    }
 }
