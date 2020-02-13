@@ -6,13 +6,18 @@ $(document).ready(function () {
         params._token = $('meta[name="csrf-token"]').attr('content');
         return params;
     };
-    getMenus('cdi');
-    getMenus('hcb');
-    getMenus('hi');
+    // getMenus('cdi');
+    // getMenus('hcb');
+    // getMenus('hi');
 });
 
 function getMenus(type_menu) {
-    $('#tbl-menus_' + type_menu).DataTable({
+    if ($.fn.DataTable.isDataTable('#tbl-menus')) {
+        $('#tbl-menus tbody').empty();
+        $('#tbl-menus').dataTable().fnDestroy();
+        $("#tbl-menus tbody tr").remove();
+    }
+    $('#tbl-menus').DataTable({
         processing: true,
         serverSide: true,
         searching: true,
@@ -146,7 +151,10 @@ var objVue = new Vue({
         },
         tipo_uds_id: function (val) {
             this.menus_id = null;
-            this.getMenusChage(val.name);
+            this.getMenusChage(val.id);
+        },
+        type_uds_id: function (val) {
+            getMenus(val.id);
         }
     },
     mounted: function () {
@@ -154,6 +162,7 @@ var objVue = new Vue({
         this.getClientes();
         this.getGrupoEdad();
         this.getTipoUnidadServicio();
+        getMenus(1);// 1 es CDI
         const dict = {
             custom: {
                 name: {
@@ -194,6 +203,7 @@ var objVue = new Vue({
         menus: [],
         menus_id: null,
         tipo_uds_id: null,
+        type_uds_id: null,// es para el listado de los menus
         id_menu_copy: null,
         name_menu: null,
         name_uds: null,

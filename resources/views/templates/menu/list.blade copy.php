@@ -10,15 +10,11 @@
       <div class="modal-body">
         <form id="formList" class="form-horizontal" role="form" autocomplete="off">
           <div class="row">
-            <div class="col-lg-12">
-              <div class="form-group">
-                <button type="button" class="btn btn-success btn-xs pull-right" data-target="#modalCambio"
-                  data-toggle="modal"><i class="fa fa-refresh"></i> Cambio U.M Pedido</button>
-              </div>
-            </div>
+            <button type="button" class="btn btn-success btn-xs pull-right" data-target="#modalCambio"
+              data-toggle="modal"><i class="fa fa-refresh"></i> Cambio U.M Pedido</button>
 
             <!-- Nav tabs -->
-            {{-- <ul class="nav nav-tabs" role="tablist">
+            <ul class="nav nav-tabs" role="tablist">
               <li role="presentation" :class="{ 'active': cdi_menu }"><a href="#cdi" aria-controls="cdi" role="tab"
                   data-toggle="tab">CDI</a></li>
               <li role="presentation" :class="{ 'active': hcb_menu }"><a href="#hcb" aria-controls="hcb" role="tab"
@@ -74,29 +70,6 @@
                     </table>
                   </div>
                 </div>
-              </div>
-            </div> --}}
-          </div>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="form-group">
-                <el-select v-model="type_uds_id" clearable placeholder="Tipo Unidad Servicio" value-key="id">
-                  <el-option v-for="item in tipo_us" :key="item.id" :label="item.name" :value="item">
-                  </el-option>
-                </el-select>
-              </div>
-            </div>
-            <div class="col-lg-12" style="margin-top: 20px;">
-              <div class="table-responsive">
-                <table id="tbl-menus" class="table table-striped table-hover table-bordered" style="width: 100%;">
-                  <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Tipo UDS</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                </table>
               </div>
             </div>
           </div>

@@ -152,18 +152,18 @@ class MenuController extends Controller
     public function getAll($type)
     {
        
-      if($type == 1){
-        $type = 'cdi';
-      }else{
-        if($type == 2){
-          $type = 'hcb';
-        }
-      }
-      $type = str_replace("_", " ", $type);
+    //   if($type == 1){
+    //     $type = 'cdi';
+    //   }else{
+    //     if($type == 2){
+    //       $type = 'hcb';
+    //     }
+    //   }
+    //   $type = str_replace("_", " ", $type);
         $data = Menu::join('clientes as b', 'menu.cliente_id', 'b.id')
             ->join('admin_table AS c', 'menu.tipo_us_id', 'c.id')
             ->select('menu.id', 'menu.name', 'menu.cliente_id', 'b.name AS cliente', 'menu.tipo_us_id', 'c.name AS tipo_uds')
-            ->where('c.name', $type)
+            ->where('c.id', $type)
             ->get();
         return \DataTables::of($data)->make(true);
     }
