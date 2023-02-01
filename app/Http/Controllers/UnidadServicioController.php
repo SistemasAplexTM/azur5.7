@@ -30,7 +30,7 @@ class UnidadServicioController extends Controller
             $data             = (new UnidadServicio)->fill($request->all());
             $data->created_at = date('Y-m-d H:i:s');
             if ($data->save()) {
-                $this->AddToLog('Unidad de servicio creada (id :'.$data->id.')');
+                $this->AddToLog('Unidad de servicio creada (id :' . $data->id . ')');
                 $answer = array(
                     "datos"  => $request->all(),
                     "code"   => 200,
@@ -65,13 +65,12 @@ class UnidadServicioController extends Controller
         try {
             $data           = UnidadServicio::findOrFail($id);
             $data->update($request->all());
-            $this->AddToLog('Unidad de servicio editada (id :'.$data->id.')');
+            $this->AddToLog('Unidad de servicio editada (id :' . $data->id . ')');
             $answer = array(
                 "datos" => $request->all(),
                 "code"  => 200,
             );
             return $answer;
-
         } catch (\Exception $e) {
             $answer = array(
                 "error" => $e,
@@ -92,7 +91,7 @@ class UnidadServicioController extends Controller
         try {
             $data = UnidadServicio::findOrFail($id);
             if ($data->delete()) {
-                $this->AddToLog('Unidad de servicio eliminada (id :'.$data->id.')');
+                $this->AddToLog('Unidad de servicio eliminada (id :' . $data->id . ')');
                 $answer = array(
                     "code" => 200,
                 );
@@ -127,8 +126,8 @@ class UnidadServicioController extends Controller
     public function getAll()
     {
         $data = UnidadServicio::join('clientes AS b', 'unidad_servicio.cliente_id', 'b.id')
-        ->join('admin_table AS c', 'unidad_servicio.tipo_unidad_servicio_id', 'c.id')
-        ->leftJoin(DB::raw("(SELECT
+            ->join('admin_table AS c', 'unidad_servicio.tipo_unidad_servicio_id', 'c.id')
+            ->leftJoin(DB::raw("(SELECT
                             a.unidad_servicio_id,
                             a.grupo_edad_id,
                             b.`name`,
@@ -139,7 +138,7 @@ class UnidadServicioController extends Controller
                         WHERE
                             a.grupo_edad_id = 24
                     ) AS d"), 'unidad_servicio.id', 'd.unidad_servicio_id')
-        ->leftJoin(DB::raw("(SELECT
+            ->leftJoin(DB::raw("(SELECT
                             a.unidad_servicio_id,
                             a.grupo_edad_id,
                             b.`name`,
@@ -150,8 +149,31 @@ class UnidadServicioController extends Controller
                         WHERE
                             a.grupo_edad_id = 25
                     ) AS e"), 'unidad_servicio.id', 'e.unidad_servicio_id')
-        ->select('unidad_servicio.id', 'unidad_servicio.cliente_id', 'unidad_servicio.tipo_unidad_servicio_id', 'unidad_servicio.name', 'unidad_servicio.address', 'unidad_servicio.phone', 'b.name AS cliente', 'c.name AS tipo_us', 'd.coverage AS coverage_1_3','e.coverage AS coverage_4_5')
-        ->get();
+            ->leftJoin(DB::raw("(SELECT
+                            a.unidad_servicio_id,
+                            a.grupo_edad_id,
+                            b.`name`,
+                            a.coverage
+                        FROM
+                            pivot_unidad_servicio_edad AS a
+                        INNER JOIN admin_table AS b ON a.grupo_edad_id = b.id
+                        WHERE
+                            a.grupo_edad_id = 81
+                    ) AS f"), 'unidad_servicio.id', 'f.unidad_servicio_id')
+            ->select(
+                'unidad_servicio.id',
+                'unidad_servicio.cliente_id',
+                'unidad_servicio.tipo_unidad_servicio_id',
+                'unidad_servicio.name',
+                'unidad_servicio.address',
+                'unidad_servicio.phone',
+                'b.name AS cliente',
+                'c.name AS tipo_us',
+                'd.coverage AS coverage_1_3',
+                'e.coverage AS coverage_4_5',
+                'f.coverage AS coverage_menor_1'
+            )
+            ->get();
         return \DataTables::of($data)->make(true);
     }
 
@@ -201,11 +223,12 @@ class UnidadServicioController extends Controller
             $id = DB::table('pivot_unidad_servicio_edad')->insertGetId(
                 [
                     /* VALORES POR DEFECTO AL CREAR EL DOCUMENTO INICIAL */
-                    'unidad_servicio_id'=> $request->unidad_servicio_id,
+                    'unidad_servicio_id' => $request->unidad_servicio_id,
                     'grupo_edad_id'     => $request->age_group_id,
                     'coverage'          => $request->coverage
-                ]);
-            $this->AddToLog('Grupo edad agregado a unidad de servicio (us_id :'.$request->unidad_servicio_id.') grupo edad id (us_id :'.$request->age_group_id.') id registro creado (us_id :'.$request->id.')');
+                ]
+            );
+            $this->AddToLog('Grupo edad agregado a unidad de servicio (us_id :' . $request->unidad_servicio_id . ') grupo edad id (us_id :' . $request->age_group_id . ') id registro creado (us_id :' . $request->id . ')');
             $answer = array(
                 "datos"  => $request->all(),
                 "code"   => 200,
@@ -225,12 +248,11 @@ class UnidadServicioController extends Controller
     {
         try {
             DB::table('pivot_unidad_servicio_edad')->where('id', $id)->delete();
-            
-            $this->AddToLog('Grupo edad eliminado de unidad de servicio (id :'.$id.')');
+
+            $this->AddToLog('Grupo edad eliminado de unidad de servicio (id :' . $id . ')');
             $answer = array(
                 "code" => 200,
             );
-            
         } catch (Exception $e) {
             return $e;
         }
@@ -240,9 +262,9 @@ class UnidadServicioController extends Controller
     {
         try {
             DB::table('pivot_unidad_servicio_edad')
-            ->where('id', $request->pk)
-            ->update(['coverage' => $request->value]);
-            $this->AddToLog('Grupo edad editado de unidad de servicio (id :'.$request->pk.')');
+                ->where('id', $request->pk)
+                ->update(['coverage' => $request->value]);
+            $this->AddToLog('Grupo edad editado de unidad de servicio (id :' . $request->pk . ')');
             $answer = array(
                 "datos"  => $request->all(),
                 "code"   => 200,
@@ -257,5 +279,4 @@ class UnidadServicioController extends Controller
             return $answer;
         }
     }
-
 }

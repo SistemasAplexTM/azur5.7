@@ -29,7 +29,9 @@ $(window).load(function () {
             name: 'phone'
         }, {
             "render": function (data, type, full, meta) {
-                return '1 a 3: <strong>' + full.coverage_1_3 + '</strong><br>4 a 5: <strong>' + full.coverage_4_5 + '</strong>';
+                return '1 a 3: <strong>' + full.coverage_1_3 + '</strong><br>'+
+                '4 a 5: <strong>' + full.coverage_4_5 + '</strong><br>'+
+                '< a 1: <strong>' + full.coverage_menor_1 + '</strong>';
             }
         }, {
             sortable: false,
