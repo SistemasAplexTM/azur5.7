@@ -101,10 +101,10 @@
 				<th></th>
 			</tr>
 			<tr>
-				<th>NOMBRE : Jefferson Suárez</th>
+				<th>NOMBRE : NESTOR ESPINOSA</th>
 			</tr>
 			<tr>
-				<th>CEDULA: 1143925475</th>
+				<th>CEDULA: 1151940827</th>
 			</tr>
 			<tr>
 				<th>FIRMA:__________________________________</th>
