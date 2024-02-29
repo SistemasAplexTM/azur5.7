@@ -172,7 +172,7 @@
             <div class="col-lg-7">
               <div class="form-group">
                 <label for="produc_type_id" class="control-label gcore-label-top">Producto:</label>
-                <el-select v-model="product_id_change" clearable placeholder="Producto" value-key="id">
+                <el-select v-model="product_id_change" clearable filterable placeholder="Producto" value-key="id">
                   <el-option v-for="item in products" :key="item.id" :label="item.name" :value="item">
                   </el-option>
                 </el-select>

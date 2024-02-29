@@ -16,6 +16,9 @@
 
 @section('content')
 <style type="text/css">
+  .modal-dialog{
+    width: 40%;
+  }
 </style>
 <div class="row" id="menus">
   <form id="formMenus" enctype="multipart/form-data" class="form-horizontal" role="form">
@@ -70,7 +73,7 @@
           </div>
           <div class="row">
             <div class="col-lg-5">
-              <el-select v-model="product_id" clearable placeholder="Producto" value-key="id" @change="setUnidadMedida">
+              <el-select v-model="product_id" clearable filterable placeholder="Producto" value-key="id" @change="setUnidadMedida">
                 <el-option v-for="item in products" :key="item.id" :label="item.name" :value="item">
                 </el-option>
               </el-select>
