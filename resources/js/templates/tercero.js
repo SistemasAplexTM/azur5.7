@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    $('#product_types').select2({
+        placeholder: 'Selecciona los tipos de producto',
+        allowClear: true
+    });
     $('#tbl-tercero').DataTable({
         processing: true,
         serverSide: true,
@@ -48,6 +52,7 @@ var objVue = new Vue({
         document_nit: null,
         address: null,
         phone: null,
+        product_types: [],
         editar: 0
     },
     methods: {
@@ -56,6 +61,7 @@ var objVue = new Vue({
             this.document_nit = null;
             this.address = null;
             this.phone = null;
+            this.product_types = [];
             this.editar = 0;
             this.errors.clear();
         },

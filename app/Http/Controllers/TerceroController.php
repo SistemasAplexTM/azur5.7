@@ -2,12 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\AdminTable;
 use App\Tercero;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TerceroController extends Controller
 {
+
+    /**
+     * Fetch product types from AdminTable where table_name is 'tipo_producto'.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getProductTypes()
+    {
+        $productTypes = AdminTable::where('table_name', 'tipo_producto')->get();
+        return $productTypes;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +28,8 @@ class TerceroController extends Controller
      */
     public function index()
     {
-        return view('templates/tercero');
+        $productTypes = $this->getProductTypes();
+        return view('templates/tercero', compact('productTypes'));
     }
 
     /**
@@ -30,7 +44,7 @@ class TerceroController extends Controller
             $data             = (new Tercero)->fill($request->all());
             $data->created_at = date('Y-m-d H:i:s');
             if ($data->save()) {
-                $this->AddToLog('Tercero creado (id :'.$data->id.')');
+                $this->AddToLog('Tercero creado (id :' . $data->id . ')');
                 $answer = array(
                     "datos"  => $request->all(),
                     "code"   => 200,
@@ -65,13 +79,12 @@ class TerceroController extends Controller
         try {
             $data           = Tercero::findOrFail($id);
             $data->update($request->all());
-            $this->AddToLog('Tercero editado (id :'.$data->id.')');
+            $this->AddToLog('Tercero editado (id :' . $data->id . ')');
             $answer = array(
                 "datos" => $request->all(),
                 "code"  => 200,
             );
             return $answer;
-
         } catch (\Exception $e) {
             $answer = array(
                 "error" => $e,
@@ -92,7 +105,7 @@ class TerceroController extends Controller
         try {
             $data = Tercero::findOrFail($id);
             if ($data->delete()) {
-                $this->AddToLog('Tercero eliminado (id :'.$data->id.')');
+                $this->AddToLog('Tercero eliminado (id :' . $data->id . ')');
                 $answer = array(
                     "code" => 200,
                 );
@@ -143,16 +156,16 @@ class TerceroController extends Controller
 
     public function getByProductType($produc_type_id)
     {
-      $data = DB::table('tercero_tipo_producto_pivot as a')
-      ->join('terceros AS b', 'b.id', 'a.tercero_id')
-      ->join('admin_table AS c', 'c.id', 'a.tipo_producto_id')
-      ->select('b.id', 'b.name')
-      ->where([
-        ['a.tipo_producto_id', $produc_type_id],
-        ['a.deleted_at', null]
-      ])
-      ->groupBy('b.id', 'b.name')
-      ->get();
-      return $data;
+        $data = DB::table('tercero_tipo_producto_pivot as a')
+            ->join('terceros AS b', 'b.id', 'a.tercero_id')
+            ->join('admin_table AS c', 'c.id', 'a.tipo_producto_id')
+            ->select('b.id', 'b.name')
+            ->where([
+                ['a.tipo_producto_id', $produc_type_id],
+                ['a.deleted_at', null]
+            ])
+            ->groupBy('b.id', 'b.name')
+            ->get();
+        return $data;
     }
 }
