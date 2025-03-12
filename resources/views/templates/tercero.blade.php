@@ -6,7 +6,7 @@
             <h2>Administración</h2>
             <ol class="breadcrumb">
                 <li class="active">
-                    <strong>Tercero</strong>
+                    <strong>Proveedores</strong>
                 </li>
             </ol>
         </div>
@@ -21,7 +21,7 @@
             <div class="col-lg-5">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>Registro de Terceros</h5>
+                        <h5>Registro de Proveedores</h5>
                         <div class="ibox-tools">
 
                         </div>
@@ -109,7 +109,7 @@
         <div class="col-lg-7">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Terceros</h5>
+                    <h5>Proveedores</h5>
                     <div class="ibox-tools">
 
                     </div>

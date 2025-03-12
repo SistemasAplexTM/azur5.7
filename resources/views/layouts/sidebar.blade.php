@@ -146,7 +146,7 @@
                     </li>
                     <li>
                         <a href="{{ url('administracion/presentacion')}}">
-                            <spam class="fa fa-box">
+                            <spam class="fa fa-puzzle-piece">
                             </spam>
                             Presentaciones
                         </a>
@@ -174,7 +174,7 @@
                     </li>
                     <li>
                         <a href="{{ url('administracion/tipo_producto')}}">
-                            <spam class="fa fa-cubes">
+                            <spam class="fa fa-tags">
                             </spam>
                             Tipo producto
                         </a>

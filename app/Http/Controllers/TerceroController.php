@@ -39,33 +39,52 @@ class TerceroController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        try {
-            $data             = (new Tercero)->fill($request->all());
-            $data->created_at = date('Y-m-d H:i:s');
-            if ($data->save()) {
-                $this->AddToLog('Tercero creado (id :' . $data->id . ')');
-                $answer = array(
-                    "datos"  => $request->all(),
-                    "code"   => 200,
-                    "status" => 200,
-                );
-            } else {
-                $answer = array(
-                    "error"  => 'Error al intentar Eliminar el registro.',
-                    "code"   => 600,
-                    "status" => 500,
-                );
+{
+    try {
+        // Creamos una instancia del modelo Tercero y llenamos con los datos excepto los tipos de producto
+        $data = new Tercero;
+        $data->fill($request->except('product_types'));
+        $data->created_at = date('Y-m-d H:i:s');
+        
+        if ($data->save()) {
+            // Extraemos los tipos de producto enviados
+            $tiposProducto = $request->input('product_types', []);
+            
+            // Si llegan como string JSON, lo decodificamos
+            if (is_string($tiposProducto)) {
+                $tiposProducto = json_decode($tiposProducto, true);
             }
-            return $answer;
-        } catch (\Exception $e) {
-            $answer = array(
-                "error" => $e,
-                "code"  => 600,
-            );
-            return $answer;
+            
+            // Extraemos solo los IDs (suponiendo que se envían como array de objetos)
+            $tiposProductoIDs = array_map(function($tipo) {
+                return is_array($tipo) ? $tipo['id'] : $tipo->id;
+            }, $tiposProducto);
+            
+            // Sincronizamos la relación many-to-many en la tabla pivote
+            $data->tiposProducto()->sync($tiposProductoIDs);
+            
+            $this->AddToLog('Tercero creado (id :' . $data->id . ')');
+            $answer = [
+                "datos"  => $request->all(),
+                "code"   => 200,
+                "status" => 200,
+            ];
+        } else {
+            $answer = [
+                "error"  => 'Error al intentar guardar el registro.',
+                "code"   => 600,
+                "status" => 500,
+            ];
         }
+        return $answer;
+    } catch (\Exception $e) {
+        $answer = [
+            "error" => $e->getMessage(),
+            "code"  => 600,
+        ];
+        return $answer;
     }
+}
 
     /**
      * Update the specified resource in storage.
@@ -78,7 +97,24 @@ class TerceroController extends Controller
     {
         try {
             $data           = Tercero::findOrFail($id);
-            $data->update($request->all());
+            $data->update($request->except('product_types'));
+
+            // Obtener los datos enviados
+            $tiposProducto = $request->input('product_types', []);
+
+            // Si el campo viene como string JSON, decodificarlo
+            if (is_string($tiposProducto)) {
+                $tiposProducto = json_decode($tiposProducto, true);
+            }
+
+            // Extraer solo los IDs
+            $tiposProductoIDs = array_map(function ($tipo) {
+                return is_array($tipo) ? $tipo['id'] : $tipo->id;
+            }, $tiposProducto);
+
+            // Sincronizamos la relación many-to-many en la tabla pivote
+            $data->tiposProducto()->sync($tiposProductoIDs);
+
             $this->AddToLog('Tercero editado (id :' . $data->id . ')');
             $answer = array(
                 "datos" => $request->all(),
@@ -86,11 +122,10 @@ class TerceroController extends Controller
             );
             return $answer;
         } catch (\Exception $e) {
-            $answer = array(
-                "error" => $e,
+            return array(
+                "error" => $e->getMessage(),
                 "code"  => 600,
             );
-            return $answer;
         }
     }
 
@@ -141,14 +176,14 @@ class TerceroController extends Controller
     {
         $data = Tercero::with('tiposProducto')->get();
         return \DataTables::of($data)
-        ->addColumn('tipos_producto', function($tercero) {
-            return $tercero->tiposProducto->map(function($tipo) {
-                return [
-                    'id' => $tipo->id,
-                    'name' => $tipo->name
-                ];
-            })->toArray();
-        })->make(true);
+            ->addColumn('tipos_producto', function ($tercero) {
+                return $tercero->tiposProducto->map(function ($tipo) {
+                    return [
+                        'id' => $tipo->id,
+                        'name' => $tipo->name
+                    ];
+                })->toArray();
+            })->make(true);
     }
 
     public function getDataSelect()
