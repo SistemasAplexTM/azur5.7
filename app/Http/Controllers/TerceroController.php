@@ -139,8 +139,16 @@ class TerceroController extends Controller
      */
     public function getAll()
     {
-        $data = Tercero::get();
-        return \DataTables::of($data)->make(true);
+        $data = Tercero::with('tiposProducto')->get();
+        return \DataTables::of($data)
+        ->addColumn('tipos_producto', function($tercero) {
+            return $tercero->tiposProducto->map(function($tipo) {
+                return [
+                    'id' => $tipo->id,
+                    'name' => $tipo->name
+                ];
+            })->toArray();
+        })->make(true);
     }
 
     public function getDataSelect()

@@ -1,8 +1,4 @@
 $(document).ready(function () {
-    $('#product_types').select2({
-        placeholder: 'Selecciona los tipos de producto',
-        allowClear: true
-    });
     $('#tbl-tercero').DataTable({
         processing: true,
         serverSide: true,
@@ -23,8 +19,9 @@ $(document).ready(function () {
         }, {
             sortable: false,
             "render": function (data, type, full, meta) {
+                var tiposProductoJson = encodeURIComponent(JSON.stringify(full.tipos_producto));
                 var params = [
-                    full.id, "'" + full.name + "'", "'" + full.document_nit + "'", "'" + full.address + "'", "'" + full.phone + "'"
+                    full.id, "'" + full.name + "'", "'" + full.document_nit + "'", "'" + full.address + "'", "'" + full.phone + "'", "'" + tiposProductoJson + "'"
                 ];
                 var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
                 var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
@@ -34,13 +31,14 @@ $(document).ready(function () {
     });
 });
 
-function edit(id, name, document_nit, address, phone) {
+function edit(id, name, document_nit, address, phone, tipos_producto) {
     var data = {
         id: id,
         name: name,
         document_nit: document_nit,
         address: address,
-        phone: phone
+        phone: phone,
+        tipos_producto: JSON.parse(decodeURIComponent(tipos_producto))
     };
     objVue.edit(data);
 }
@@ -74,6 +72,7 @@ var objVue = new Vue({
                         'document_nit': this.document_nit,
                         'address': this.address,
                         'phone': this.phone,
+                        'product_types': this.product_types
                     }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro creado correctamente.');
@@ -101,6 +100,7 @@ var objVue = new Vue({
                         'document_nit': this.document_nit,
                         'address': this.address,
                         'phone': this.phone,
+                        'product_types': this.product_types
                     }).then(function (response) {
                         if (response.data['code'] == 200) {
                             toastr.success('Registro Actualizado correctamente');
@@ -124,6 +124,7 @@ var objVue = new Vue({
             this.document_nit = data['document_nit'];
             this.address = data['address'];
             this.phone = data['phone'];
+            this.product_types = data['tipos_producto'];
             this.editar = 1;
         },
         cancel: function () {

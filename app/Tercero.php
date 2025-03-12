@@ -24,4 +24,14 @@ class Tercero extends Model
         'phone',
         'email'
     ];
+
+    public function tiposProducto()
+    {
+        return $this->belongsToMany(
+            AdminTable::class,                      // Modelo relacionado
+            'tercero_tipo_producto_pivot',          // Tabla pivot
+            'tercero_id',                           // FK del modelo actual en la tabla pivot
+            'tipo_producto_id'                      // FK del modelo relacionado en la tabla pivot
+        );
+    }
 }
