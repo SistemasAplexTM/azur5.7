@@ -344,7 +344,7 @@ export default {
       window.open(
         "../" +
           this.minuta.id +
-          "/getPedidoCompleto/" +
+          "/getPedidoCompleto/" +this.coverage_1_3+"/"+this.coverage_4_5 +"/"+
           this.produc_type_id.id +
           "/" +
           null +
@@ -528,7 +528,7 @@ export default {
                 text:
                   '<i class="fa fa-print" aria-hidden="true"></i> Pedido completo',
                 action: function(e, dt, node, config) {
-                  window.open("../" + me.minuta.id + "/getPedidoCompleto");
+                  window.open("../" + me.minuta.id + "/getPedidoCompleto/"+me.coverage_1_3+"/"+me.coverage_4_5);
                 }
               },
               {
@@ -538,7 +538,7 @@ export default {
                   window.open(
                     "../" +
                       me.minuta.id +
-                      "/getPedidoCompleto/" +
+                      "/getPedidoCompleto/" +me.coverage_1_3+"/"+me.coverage_4_5 +"/"+
                       null +
                       "/" +
                       null +
@@ -556,7 +556,7 @@ export default {
                   window.open(
                     "../" +
                       me.minuta.id +
-                      "/getPedidoCompleto/" +
+                      "/getPedidoCompleto/" +me.coverage_1_3+"/"+me.coverage_4_5 +"/"+
                       null +
                       "/" +
                       id_us +
@@ -576,7 +576,7 @@ export default {
           }
         ],
         paging: false,
-        ajax: "getMenusUnidadesByMinuta/" + id_us + "/" + this.coverage_1_3 + "/" + this.coverage_4_5,
+        ajax: "getMenusUnidadesByMinuta/" + id_us + "/" + me.coverage_1_3 + "/" + me.coverage_4_5,
         columns: [
           {
             data: "producto",

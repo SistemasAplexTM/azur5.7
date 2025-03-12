@@ -119484,7 +119484,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   methods: {
     imprimirPedido: function imprimirPedido() {
-      window.open("../" + this.minuta.id + "/getPedidoCompleto/" + this.produc_type_id.id + "/" + null + "/" + null + "/" + this.remanencia_tipo_prod, "_blank");
+      window.open("../" + this.minuta.id + "/getPedidoCompleto/" + this.coverage_1_3 + "/" + this.coverage_4_5 + "/" + this.produc_type_id.id + "/" + null + "/" + null + "/" + this.remanencia_tipo_prod, "_blank");
     },
     getProductType: function getProductType() {
       var me = this;
@@ -119626,17 +119626,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           buttons: [{
             text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido completo',
             action: function action(e, dt, node, config) {
-              window.open("../" + me.minuta.id + "/getPedidoCompleto");
+              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + me.coverage_1_3 + "/" + me.coverage_4_5);
             }
           }, {
             text: '<i class="fa fa-print" aria-hidden="true"></i> Completo con remanencias',
             action: function action(e, dt, node, config) {
-              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + null + "/" + null + "/" + true);
+              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + me.coverage_1_3 + "/" + me.coverage_4_5 + "/" + null + "/" + null + "/" + null + "/" + true);
             }
           }, {
             text: '<i class="fa fa-print" aria-hidden="true"></i> Pedido solo UDS',
             action: function action(e, dt, node, config) {
-              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + null + "/" + id_us + "/" + me.name_minuta);
+              window.open("../" + me.minuta.id + "/getPedidoCompleto/" + me.coverage_1_3 + "/" + me.coverage_4_5 + "/" + null + "/" + id_us + "/" + me.name_minuta);
             }
           }, {
             text: '<i class="fa fa-tasks"></i> Por tipo de producto',
@@ -119647,7 +119647,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           }]
         }],
         paging: false,
-        ajax: "getMenusUnidadesByMinuta/" + id_us + "/" + this.coverage_1_3 + "/" + this.coverage_4_5,
+        ajax: "getMenusUnidadesByMinuta/" + id_us + "/" + me.coverage_1_3 + "/" + me.coverage_4_5,
         columns: [{
           data: "producto",
           name: "producto"
