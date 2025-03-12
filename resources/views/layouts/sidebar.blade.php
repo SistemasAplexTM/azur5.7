@@ -43,7 +43,6 @@
                     4plbox
                 </div>
             </li>
-            <!--id='firstMenu'-->
             <li class="active" id="firstMenu">
                 <a href="" style="background-color: #BA55D3; color: white;">
                     <i class="fa fa-clipboard">
@@ -96,6 +95,13 @@
                             <spam class="fa fa-home">
                             </spam>
                             Unidades de servicio
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('tercero.index') }}">
+                            <spam class="fa fa-users">
+                            </spam>
+                            Proveedores
                         </a>
                     </li>
                 </ul>
@@ -202,5 +208,4 @@
             </li>
         </ul>
     </div>
-
 </nav>
