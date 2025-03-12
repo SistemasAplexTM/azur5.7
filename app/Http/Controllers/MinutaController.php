@@ -83,7 +83,7 @@ class MinutaController extends Controller
                             ]);
 
                             /* INSERCION DE TABLA AUXILIAR CONSECUTIVO */
-                            $consecutive = DB::select("CALL getConsecutivoByTipoDocumento(?,?)",array(1, $id_doc));
+                            $consecutive = DB::select("CALL getConsecutivoByTipoDocumento(?,?)", array(1, $id_doc));
                             $consecutivo        = $consecutive[0]->consecutivo;
                             $data2              = Documento::findOrFail($id_doc);
                             $data2->consecutivo = $consecutivo;
@@ -134,7 +134,7 @@ class MinutaController extends Controller
                                         'products_id'        => $value_md->product_id,
                                         'transaccion'        => 2, //salida
                                         'cantidad'           => $value_md->coverage * $value_md->cantidad,
-                                        'cantidad_final'     => -($value_md->coverage * $value_md->cantidad),
+                                        'cantidad_final'     => - ($value_md->coverage * $value_md->cantidad),
                                         'unidad_medida_real' => $value_md->unidad_medida_real,
                                         'cantidad_unit'      => $value_md->cantidad_unit,
                                         'unidad_medida'      => $value_md->unidad_medida,
@@ -143,7 +143,6 @@ class MinutaController extends Controller
                                         'coverage'           => $value_md->coverage,
                                         'created_at'         => date('Y-m-d H:i:s'),
                                     ]);
-
                                 }
                             }
                             $cont++;
@@ -226,38 +225,50 @@ class MinutaController extends Controller
                 $z++;
             }
         }
-        $unidades = DB::table('minuta_documento_pivot AS a')
+        $unidades = $this->getUnidades($id);
+
+        return view('templates/minuta/minuta', compact(
+            'minuta',
+            'unidades',
+            'menus'
+        ));
+    }
+
+    public function getUnidades($id)
+    {
+        $data = DB::table('minuta_documento_pivot AS a')
             ->Join('documento AS b', 'a.documento_id', 'b.id')
             ->Join('unidad_servicio AS c', 'b.unidad_servicio_id', 'c.id')
             ->leftJoin(DB::raw('(SELECT
-                                z.documento_id,
-                                z.coverage
-                            FROM
-                                documento_detalle AS z
-                            WHERE
-                                z.edad_id = 24
-                            GROUP BY
-                                z.documento_id,
-                                z.coverage
-                        ) AS d'), 'b.id', 'd.documento_id')
+                            z.documento_id,
+                            z.coverage
+                        FROM
+                            documento_detalle AS z
+                        WHERE
+                            z.edad_id = 24
+                        GROUP BY
+                            z.documento_id,
+                            z.coverage
+                    ) AS d'), 'b.id', 'd.documento_id')
             ->leftJoin(DB::raw('(SELECT
-                                z.documento_id,
-                                z.coverage
-                            FROM
-                                documento_detalle AS z
-                            WHERE
-                                z.edad_id = 25
-                            GROUP BY
-                                z.documento_id,
-                                z.coverage
-                        ) AS e'), 'b.id', 'e.documento_id')
+                            z.documento_id,
+                            z.coverage
+                        FROM
+                            documento_detalle AS z
+                        WHERE
+                            z.edad_id = 25
+                        GROUP BY
+                            z.documento_id,
+                            z.coverage
+                    ) AS e'), 'b.id', 'e.documento_id')
             ->select(
                 'c.name',
                 'd.coverage AS coverage_1_3',
                 'e.coverage AS coverage_4_5',
                 'c.id',
                 'c.cliente_id',
-                'c.tipo_unidad_servicio_id')
+                'c.tipo_unidad_servicio_id'
+            )
             ->groupBy(
                 'c.name',
                 'c.id',
@@ -268,12 +279,7 @@ class MinutaController extends Controller
             )
             ->where('a.minuta_id', $id)
             ->get();
-
-        return view('templates/minuta/minuta', compact(
-            'minuta',
-            'unidades',
-            'menus'
-        ));
+        return $data;
     }
 
     public function update(Request $request, $id)
@@ -287,7 +293,6 @@ class MinutaController extends Controller
                 "code"  => 200,
             );
             return $answer;
-
         } catch (\Exception $e) {
             $answer = array(
                 "error" => $e,
@@ -394,16 +399,16 @@ class MinutaController extends Controller
                 DB::raw("Round( (Sum( If(b.numero_dia = 3 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '8'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 4 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '9'"),
                 DB::raw("Round( (Sum( If(b.numero_dia = 5 and  c.edad_id = 25, c.cantidad_unit, NULL ))),2) as '10'"),
-                DB::raw($this->st1()." as 'st-1'"),
-                DB::raw($this->st2()." as 'st-2'"),
+                DB::raw($this->st1() . " as 'st-1'"),
+                DB::raw($this->st2() . " as 'st-2'"),
                 /* st-3 = st-1 * covertura */
-                DB::raw($this->st3()." as 'st-3'"),
+                DB::raw($this->st3() . " as 'st-3'"),
                 /* st-4 = st-2 * covertura */
-                DB::raw($this->st4()." as 'st-4'"),
+                DB::raw($this->st4() . " as 'st-4'"),
                 /* GRAN TOTAL (st-5 = st-3 + st-4) */
-                DB::raw($this->st5()." as 'st-5'"),
+                DB::raw($this->st5() . " as 'st-5'"),
                 /* GRAN TOTAL (st-6 = (st-3 + st-4)/ b.conversion) */
-                DB::raw($this->st6()." as 'st-6'")
+                DB::raw($this->st6() . " as 'st-6'")
             )
             ->where([
                 ['b.unidad_servicio_id', $id_us],
@@ -419,36 +424,36 @@ class MinutaController extends Controller
             )
             // ->havingRaw("(".$this->st3()." + ". $this->st4() .") > 0")
             ->get();
-            // return DB::getQueryLog();
+        // return DB::getQueryLog();
         return \DataTables::of($data)->make(true);
     }
 
     public function st1()
     {
-      return 'Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2)';
+        return 'Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 24), c.cantidad_unit, 0 ))),2)';
     }
     public function st2()
     {
-      return 'Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25), c.cantidad_unit, 0 ))),2)';
+        return 'Round( (Sum( If((b.feriado = 0 and b.numero_dia >= 1 and  b.numero_dia <= 5 and  c.edad_id = 25), c.cantidad_unit, 0 ))),2)';
     }
     public function st3()
     {
-      return $this->st1() . ' * ' . $this->coverage_1_3;
-    //   return $this->st1() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24)';
+        return $this->st1() . ' * ' . $this->coverage_1_3;
+        //   return $this->st1() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24)';
     }
     public function st4()
     {
-      return $this->st2() . ' * ' . $this->coverage_4_5;
-    //   return $this->st2() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)';
+        return $this->st2() . ' * ' . $this->coverage_4_5;
+        //   return $this->st2() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)';
     }
     public function st5()
     {
-      return $this->st3() . ' + ' . $this->st4();
+        return $this->st3() . ' + ' . $this->st4();
     }
     public function st6()
     {
-      // return 'IF((Round(('. $this->st5() .')/d.conversion,0) = 0),1,(Round(('. $this->st5() .')/d.conversion,0)))';
-      return 'IF(('. $this->st5() .' = 0), 0, IF((Round(('. $this->st5() .')/d.conversion,0) = 0),1,(Round(('. $this->st5() .')/d.conversion,0))) )';
+        // return 'IF((Round(('. $this->st5() .')/d.conversion,0) = 0),1,(Round(('. $this->st5() .')/d.conversion,0)))';
+        return 'IF((' . $this->st5() . ' = 0), 0, IF((Round((' . $this->st5() . ')/d.conversion,0) = 0),1,(Round((' . $this->st5() . ')/d.conversion,0))) )';
     }
 
     /*
@@ -461,12 +466,12 @@ class MinutaController extends Controller
         $this->coverage_4_5 = $coverage_4_5;
 
         $title = 'Pedido completo';
-        if($remanencia){
-          $title .= ' con remanencias';
+        if ($remanencia) {
+            $title .= ' con remanencias';
         }
 
         $wereUds = [['a.minuta_id', $id_minuta]];
-        if($id_uds != null and $id_uds != 'null'){
+        if ($id_uds != null and $id_uds != 'null') {
             $wereUds[] = ['b.unidad_servicio_id', $id_uds];
         }
         $uds = DB::table('minuta_documento_pivot AS a')
@@ -481,9 +486,9 @@ class MinutaController extends Controller
         if ($product_type != null and $product_type != 'null') {
             $where[] = ['d.tipo_producto_id', $product_type];
             $product_type_data = DB::table('admin_table AS a')
-            ->select('a.name')
-            ->where([['a.table_name', 'tipo_producto'], ['a.id', $product_type]])
-            ->first();
+                ->select('a.name')
+                ->where([['a.table_name', 'tipo_producto'], ['a.id', $product_type]])
+                ->first();
             $title = $product_type_data->name;
         }
 
@@ -499,24 +504,24 @@ class MinutaController extends Controller
 
                     $total .= "IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0))";
 
-                    $having .= "(Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = ".$value->uds." AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * ".$this->coverage_1_3." + Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = ".$value->uds." AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * ".$this->coverage_4_5.") > 0";
+                    $having .= "(Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") > 0";
 
                     $flag = false;
-                }else{
+                } else {
                     $select .= ", IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0)) AS '" . str_replace(' ', '_', $value->name_uds) . "' ";
 
                     $total .= " + IF ((Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND  b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0) = 0),1,Round((Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0 AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") / d.conversion,0))";
 
-                    $having .= " AND (Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = ".$value->uds." AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * ".$this->coverage_1_3." + Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = ".$value->uds." AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * ".$this->coverage_4_5.") > 0";
+                    $having .= " AND (Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 24),c.cantidad_unit,0))),2) * " . $this->coverage_1_3 . " + Round((Sum(IF ((b.feriado = 0  AND b.unidad_servicio_id = " . $value->uds . " AND b.numero_dia >= 1 AND b.numero_dia <= 5 AND c.edad_id = 25),c.cantidad_unit,0))),2) * " . $this->coverage_4_5 . ") > 0";
                 }
                 $cont++;
             }
 
             $fecha = DB::table('minuta_documento_pivot AS a')
-            ->join('documento AS b', 'a.documento_id', 'b.id')
-            ->select(DB::raw("min(b.fecha) AS fecha"))
-            ->where('a.minuta_id', $id_minuta)
-            ->first();
+                ->join('documento AS b', 'a.documento_id', 'b.id')
+                ->select(DB::raw("min(b.fecha) AS fecha"))
+                ->where('a.minuta_id', $id_minuta)
+                ->first();
 
             DB::statement(DB::raw("SET @unidad_fecha1 = '" . $fecha->fecha . "'"));
             $data = DB::table('minuta_documento_pivot AS a')
@@ -548,45 +553,44 @@ class MinutaController extends Controller
                 ->get();
 
             $wereR = [['a.minuta_id', $id_minuta], ['a.deleted_at', NULL]];
-            if($id_uds != null and $id_uds != 'null'){
+            if ($id_uds != null and $id_uds != 'null') {
                 $wereR[] = ['a.unidad_servicio_id', $id_uds];
             }
             $remanencias = DB::table('remanencias AS a')
-            ->join('products AS b', 'a.products_id', 'b.id')
-            ->join('unidad_servicio AS c', 'a.unidad_servicio_id', 'c.id')
-            ->select('b.name AS producto', 'a.cantidad', 'a.unidad_servicio_id AS uds_id', 'c.name AS uds_name')
-            ->where($wereR)
-            ->get();
+                ->join('products AS b', 'a.products_id', 'b.id')
+                ->join('unidad_servicio AS c', 'a.unidad_servicio_id', 'c.id')
+                ->select('b.name AS producto', 'a.cantidad', 'a.unidad_servicio_id AS uds_id', 'c.name AS uds_name')
+                ->where($wereR)
+                ->get();
             $title .= ' ' . $uds[0]->tipo_uds;
         }
         if ($send) {
-          return array(
-              'datos' => $data,
-              'uds' => $uds,
-              'remanencias' => $remanencias,
-              'remanencia' => $remanencia
-          );
-        }else {
-          Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
-              $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
-          });
-          // return view('exportView/minutaAll', compact('data', 'uds'));
-          if($id_uds != null and $id_uds != 'null'){
-              $title = $uds[0]->name_uds;
-              return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta '.$title.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-          }else{
-              return Excel::download(new InvoicesExport("exportView.minutaAll",
-                  array(
-                      'datos' => $data,
-                      'uds' => $uds,
-                      'remanencias' => $remanencias,
-                      'remanencia' => $remanencia
-                  )
-              ), $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-          }
-
+            return array(
+                'datos' => $data,
+                'uds' => $uds,
+                'remanencias' => $remanencias,
+                'remanencia' => $remanencia
+            );
+        } else {
+            Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
+                $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
+            });
+            // return view('exportView/minutaAll', compact('data', 'uds'));
+            if ($id_uds != null and $id_uds != 'null') {
+                $title = $uds[0]->name_uds;
+                return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta ' . $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+            } else {
+                return Excel::download(new InvoicesExport(
+                    "exportView.minutaAll",
+                    array(
+                        'datos' => $data,
+                        'uds' => $uds,
+                        'remanencias' => $remanencias,
+                        'remanencia' => $remanencia
+                    )
+                ), $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+            }
         }
-
     }
 
     public function getProductsMinuta($id_minuta, $uds_id)
@@ -626,7 +630,8 @@ class MinutaController extends Controller
         }
     }
 
-    public function saveRemanencia(Request $request, $id_minuta){
+    public function saveRemanencia(Request $request, $id_minuta)
+    {
         DB::beginTransaction();
         try {
             $id_doc = DB::table('remanencias')->insertGetId([
@@ -656,7 +661,8 @@ class MinutaController extends Controller
         }
     }
 
-    public function getRemanenciasByMinuta($id_minuta, $uds_id){
+    public function getRemanenciasByMinuta($id_minuta, $uds_id)
+    {
         $data = DB::table('remanencias AS a')
             ->join('products AS b', 'a.products_id', 'b.id')
             ->join('admin_table AS c', 'b.unidad_medida_id', 'c.id')
@@ -706,159 +712,154 @@ class MinutaController extends Controller
 
     public function excelProveedores($data, $name, $product_type_id, $provider_id, $complete = false)
     {
-      $type_product = AdminTable::findOrFail($product_type_id);
-      $ids = explode(',', $data);
-      $minutas = array();
-      for ($i=0; $i < count($ids); $i++) {
-        $minutas[] = $this->getPedidoCompleto($ids[$i],$product_type_id, null, null, true, true);
-      }
-      $dm = explode('-', $name);
-      $dm[0] = trim(substr($dm[0], 3));
-      $dm[1] = trim(substr(trim($dm[1]), 1, -1));
+        $type_product = AdminTable::findOrFail($product_type_id);
+        $ids = explode(',', $data);
 
-      $meses = array("ENERO","FEBRERO","MARZO","ABRIL","Mayo","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE");
-      $dm[2] = strftime($meses[date('n')-1]. " %d DE %Y");
-
-      $menu = array();
-      $remanencias = array();
-      $menuTotalPedido = array();
-      $contR = 0; //Contador para las remanencias
-      $provider = Tercero::findOrFail($provider_id);
-
-      Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
-          $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
-      });
-
-      if($complete ==='true'){
-        $menu = $this->getComplete($minutas);
-        $cont = 0;
-        $abc = array();
-        // GENERAR LETRAS DEL ABECEDARIO PARA EL EXCEL
-        for($i=65; $i<=90; $i++) {
-            $abc[] = chr($i);
-        }
-        // echo '<pre>';
-        // print_r($menu['uds']);
-        // print_r($menu['menu']);
-        // echo '</pre>';
-        // exit();
-        return Excel::download(new ExportProviderFull("exportView.proveedorFull", $menu, $dm, $provider, $type_product, $abc), 'Proveedor '.$type_product->name.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-
-      }else{
-        foreach ($minutas as $key => $value) {
-          foreach ($value['datos'] as $keyv => $val) {
-            if (array_search($val->MENU, array_column($menu, 'menu')) !== false) {
-              $menu[$keyv]['pedido'] += $val->TOTAL_PEDIDO;
-            }else{
-              $menu[$keyv]['menu'] = $val->MENU;
-              $menu[$keyv]['pedido'] = $val->TOTAL_PEDIDO;
-              $menu[$keyv]['unidad_medida'] = $val->UNIDAD_MEDIDA;
-              $menu[$keyv]['valor'] = 0;
-              $menu[$keyv]['valor_total'] = 0;
+        $minutas = array();
+        for ($i = 0; $i < count($ids); $i++) {
+            $unidades = $this->getUnidades($ids[$i]);
+            for ($u=0; $u < count($unidades); $u++) {
+                $minutas[] = $this->getPedidoCompleto($ids[$i], $unidades[$u]->coverage_1_3, $unidades[$u]->coverage_4_5, $product_type_id, null, null, true, true);
             }
-          }
-          foreach ($value['remanencias'] as $keyr => $valr) {
-            if (array_search($valr->producto, array_column($remanencias, 'menu')) !== false) {
-              $cont_ = array_search($valr->producto, array_column($remanencias, 'menu'));
-              $remanencias[$cont_]['remanencia'] += $valr->cantidad;
-            }else{
-              $remanencias[$contR]['menu'] = $valr->producto;
-              $remanencias[$contR]['remanencia'] = $valr->cantidad;
-              $contR++;
+        }
+        $dm = explode('-', $name);
+        $dm[0] = trim(substr($dm[0], 3));
+        $dm[1] = trim(substr(trim($dm[1]), 1, -1));
+
+        $meses = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "Mayo", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE");
+        $dm[2] = strftime($meses[date('n') - 1] . " %d DE %Y");
+
+        $menu = array();
+        $remanencias = array();
+        $menuTotalPedido = array();
+        $contR = 0; //Contador para las remanencias
+        $provider = Tercero::findOrFail($provider_id);
+
+        Sheet::macro('styleCells', function (Sheet $sheet, string $cellRange, array $style) {
+            $sheet->getDelegate()->getStyle($cellRange)->applyFromArray($style);
+        });
+
+        if ($complete === 'true') {
+            $menu = $this->getComplete($minutas);
+            $cont = 0;
+            $abc = array();
+            // GENERAR LETRAS DEL ABECEDARIO PARA EL EXCEL
+            for ($i = 65; $i <= 90; $i++) {
+                $abc[] = chr($i);
             }
-          }
 
+            return Excel::download(new ExportProviderFull("exportView.proveedorFull", $menu, $dm, $provider, $type_product, $abc), 'Proveedor ' . $type_product->name . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        } else {
+            foreach ($minutas as $key => $value) {
+                foreach ($value['datos'] as $keyv => $val) {
+                    if (array_search($val->MENU, array_column($menu, 'menu')) !== false) {
+                        $menu[$keyv]['pedido'] += $val->TOTAL_PEDIDO;
+                    } else {
+                        $menu[$keyv]['menu'] = $val->MENU;
+                        $menu[$keyv]['pedido'] = $val->TOTAL_PEDIDO;
+                        $menu[$keyv]['unidad_medida'] = $val->UNIDAD_MEDIDA;
+                        $menu[$keyv]['valor'] = 0;
+                        $menu[$keyv]['valor_total'] = 0;
+                    }
+                }
+                foreach ($value['remanencias'] as $keyr => $valr) {
+                    if (array_search($valr->producto, array_column($remanencias, 'menu')) !== false) {
+                        $cont_ = array_search($valr->producto, array_column($remanencias, 'menu'));
+                        $remanencias[$cont_]['remanencia'] += $valr->cantidad;
+                    } else {
+                        $remanencias[$contR]['menu'] = $valr->producto;
+                        $remanencias[$contR]['remanencia'] = $valr->cantidad;
+                        $contR++;
+                    }
+                }
+            }
+            foreach ($menu as $key => $value) {
+                $rem = array_column($remanencias, 'menu');
+                $found_key = array_search($value['menu'], $rem);
+
+                $keyR = array_search($value['menu'], array_column($remanencias, 'menu'));
+                if (array_search($value['menu'], array_column($remanencias, 'menu')) !== false) {
+                    $menu[$key]['pedido'] -= $remanencias[$keyR]['remanencia'];
+                }
+            }
+
+            return Excel::download(new ExportProvider("exportView.proveedor", $menu, $dm, $provider, $type_product), 'Proveedor ' . $type_product->name . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }
-        foreach ($menu as $key => $value) {
-          $rem = array_column($remanencias, 'menu');
-          $found_key = array_search($value['menu'], $rem);
-
-          $keyR = array_search($value['menu'], array_column($remanencias, 'menu'));
-          if (array_search($value['menu'], array_column($remanencias, 'menu')) !== false) {
-            $menu[$key]['pedido'] -= $remanencias[$keyR]['remanencia'];
-          }
-        }
-
-        return Excel::download(new ExportProvider("exportView.proveedor", $menu, $dm, $provider, $type_product), 'Proveedor '.$type_product->name.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-
-      }
-
-
     }
 
     public function getComplete($minuta)
     {
-      $data = array();
-      $uds = array();
-      $remanencias = array();
-      $menu = array();
-      foreach ($minuta as $key => $value) {
-        foreach ($value['datos'] as $ke => $val) {
-          $data[] = $val;
+        $data = array();
+        $uds = array();
+        $remanencias = array();
+        $menu = array();
+        foreach ($minuta as $key => $value) {
+            foreach ($value['datos'] as $ke => $val) {
+                $data[] = $val;
+            }
+            foreach ($value['uds'] as $ke => $val) {
+                $uds[] = $val;
+            }
+            foreach ($value['remanencias'] as $ke => $val) {
+                $remanencias[] = $val;
+            }
         }
-        foreach ($value['uds'] as $ke => $val) {
-          $uds[] = $val;
-        }
-        foreach ($value['remanencias'] as $ke => $val) {
-          $remanencias[] = $val;
-        }
-      }
 
-       // UNIR LOS DATOS QUE TENGAN EL MISMO NOMBRE DEL INGREDIENTE EN UN SOLO
-       // ARREGLO
-      foreach ($data as $ke => $val) {
-        $k = array_search($val->MENU, array_column($menu, 'MENU'));
-        if (array_search($val->MENU, array_column($menu, 'MENU')) !== false) {
-          //FUNCION QUE UNE ARREGLOS EN LA POSICION QUE ENCONTRO COINCIDENCIA
-          $menu[$k] = (object) array_merge((array) $menu[$k], (array) $val);
-        }else{
-          $menu[] = $val;
+        // UNIR LOS DATOS QUE TENGAN EL MISMO NOMBRE DEL INGREDIENTE EN UN SOLO
+        // ARREGLO
+        foreach ($data as $ke => $val) {
+            $k = array_search($val->MENU, array_column($menu, 'MENU'));
+            if (array_search($val->MENU, array_column($menu, 'MENU')) !== false) {
+                //FUNCION QUE UNE ARREGLOS EN LA POSICION QUE ENCONTRO COINCIDENCIA
+                $menu[$k] = (object) array_merge((array) $menu[$k], (array) $val);
+            } else {
+                $menu[] = $val;
+            }
         }
-      }
-      // echo '<pre>';
-      // print_r($remanencias);
-      // print_r($menu);
-      // echo '</pre>';
-      // exit();
-      $pos = array();
-      // RESTAR REMANENCIAS AL MENU CREADO
-      foreach ($menu as $key => $value) {
-        foreach ($remanencias as $ke => $val) {
-          if (($i = array_search($value->MENU, (array)$val)) !== FALSE){
-            // CREAMOS EL NOMBRE DE LA POSICION CON UN GUION DE LA UDS PARA BUSCAR LUEGO EN EL ARREGLO
-            $us = str_replace(' ', '_', $remanencias[$ke]->uds_name);
-            // BUSCAMOS LA CANTIDAD A DESCONTAR DE LA REMANENCIA
-            $rem = $remanencias[$ke]->cantidad;
-            // CONVERTIMOS EN ARRAY EL OBJETO QUE ESTAMOS RECORRIENDO
-            // PARA PODER RESTAR LA REMANENCIA DE EL Y REASIGNAR SU VALOR
-            $arr = (array)$value;
-            $arr[$us] = $arr[$us] - $rem;
-            // ASIGNAMOS EL NUEVO VALOR A LA POSICION QUE PERTENECE
-            $menu[$key]->$us = $arr[$us];
-          }
+        // echo '<pre>';
+        // print_r($remanencias);
+        // print_r($menu);
+        // echo '</pre>';
+        // exit();
+        $pos = array();
+        // RESTAR REMANENCIAS AL MENU CREADO
+        foreach ($menu as $key => $value) {
+            foreach ($remanencias as $ke => $val) {
+                if (($i = array_search($value->MENU, (array)$val)) !== FALSE) {
+                    // CREAMOS EL NOMBRE DE LA POSICION CON UN GUION DE LA UDS PARA BUSCAR LUEGO EN EL ARREGLO
+                    $us = str_replace(' ', '_', $remanencias[$ke]->uds_name);
+                    // BUSCAMOS LA CANTIDAD A DESCONTAR DE LA REMANENCIA
+                    $rem = $remanencias[$ke]->cantidad;
+                    // CONVERTIMOS EN ARRAY EL OBJETO QUE ESTAMOS RECORRIENDO
+                    // PARA PODER RESTAR LA REMANENCIA DE EL Y REASIGNAR SU VALOR
+                    $arr = (array)$value;
+                    $arr[$us] = $arr[$us] - $rem;
+                    // ASIGNAMOS EL NUEVO VALOR A LA POSICION QUE PERTENECE
+                    $menu[$key]->$us = $arr[$us];
+                }
+            }
+            // if (array_search($value->MENU, array_column($remanencias, 'producto')) !== false) {
+            //   // TOMAMOS LA POSICION DE LA REMANENCIA
+            //   $pos = array_search($value->MENU, array_column($remanencias, 'producto'));
+            //
+            //   // CREAMOS EL NOMBRE DE LA POSICION CON UN GUION DE LA UDS PARA BUSCAR LUEGO EN EL ARREGLO
+            //   $us = str_replace(' ', '_', $remanencias[$pos]->uds_name);
+            //   // echo $us . ' - '.$value->MENU.' <br>';
+            //   // BUSCAMOS LA CANTIDAD A DESCONTAR DE LA REMANENCIA
+            //   $rem = $remanencias[$pos]->cantidad;
+            //
+            //   // CONVERTIMOS EN ARRAY EL OBJETO QUE ESTAMOS RECORRIENDO
+            //   // PARA PODER RESTAR LA REMANENCIA DE EL Y REASIGNAR SU VALOR
+            //   $arr = (array)$value;
+            //   $arr[$us] = $arr[$us] - $rem;
+            //
+            //   // CONVERTIMOS NUEVAMENTE EN OBJETO EL ARREGLO MODIFICADO PARA ASIGNARSELO
+            //   // A LA POSISCION DEL ARREGLO PADRE DEL MENU
+            //   $menu[$key] = (object)$arr;
+            // }
         }
-        // if (array_search($value->MENU, array_column($remanencias, 'producto')) !== false) {
-        //   // TOMAMOS LA POSICION DE LA REMANENCIA
-        //   $pos = array_search($value->MENU, array_column($remanencias, 'producto'));
-        //
-        //   // CREAMOS EL NOMBRE DE LA POSICION CON UN GUION DE LA UDS PARA BUSCAR LUEGO EN EL ARREGLO
-        //   $us = str_replace(' ', '_', $remanencias[$pos]->uds_name);
-        //   // echo $us . ' - '.$value->MENU.' <br>';
-        //   // BUSCAMOS LA CANTIDAD A DESCONTAR DE LA REMANENCIA
-        //   $rem = $remanencias[$pos]->cantidad;
-        //
-        //   // CONVERTIMOS EN ARRAY EL OBJETO QUE ESTAMOS RECORRIENDO
-        //   // PARA PODER RESTAR LA REMANENCIA DE EL Y REASIGNAR SU VALOR
-        //   $arr = (array)$value;
-        //   $arr[$us] = $arr[$us] - $rem;
-        //
-        //   // CONVERTIMOS NUEVAMENTE EN OBJETO EL ARREGLO MODIFICADO PARA ASIGNARSELO
-        //   // A LA POSISCION DEL ARREGLO PADRE DEL MENU
-        //   $menu[$key] = (object)$arr;
-        // }
-      }
 
-      return array('menu' => $menu, 'uds' => $uds);
+        return array('menu' => $menu, 'uds' => $uds);
     }
 
     public function sqlListMinuta()
@@ -911,7 +912,8 @@ class MinutaController extends Controller
 
     public function minutaJson($minuta_id)
     {
-        $data =  DB::select(DB::raw(" 
+        $data =  DB::select(DB::raw(
+            " 
                     SELECT
                     a.id,
                     a.fecha_inicio,
@@ -937,7 +939,7 @@ class MinutaController extends Controller
                     INNER JOIN admin_table AS h ON h.id = d.edad_id
                     WHERE
                     a.id = $minuta_id"
-                ));
+        ));
         return $data;
     }
 
@@ -955,5 +957,4 @@ class MinutaController extends Controller
             a.deleted_at IS NULL AND
             a.table_name = 'grupo_edad'"));
     }
-
 }
