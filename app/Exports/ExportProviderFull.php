@@ -50,7 +50,7 @@ class ExportProviderFull implements FromView, WithEvents, WithDrawings
         $drawing->setDescription('Logo');
         $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
-        $drawing->setHeight(90);
+        $drawing->setHeight(80);
         $drawing->setCoordinates('A2');
         $drawing->setOffsetX(5);
         $drawing->setOffsetY(10);

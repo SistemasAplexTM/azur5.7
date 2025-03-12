@@ -14,7 +14,13 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
     public $view;
     public $data;
 
-    public function __construct($view, $data = "", $dm = false, $provider = false, $type_product = false)
+    public $dm;
+    public $provider;
+    public $type_product;
+
+    public function __construct($view, $data = [], $dm = false, $provider = false, $type_product = false)
+
+
     {
         $this->view  = $view;
         $this->data  = $data;
@@ -26,7 +32,12 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
     public function view(): View
     {
         return view($this->view, [
-            'data'          => $this->data,
+            'dm'            => $this->dm,
+            'provider'      => $this->provider,
+            'type_product'  => $this->type_product,
+
+            'data'          => $this->data ?? [],
+
             'header'        => $this->dm,
             'provider'      => $this->provider,
             'type_product'  => $this->type_product
@@ -40,7 +51,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
         $drawing->setDescription('Logo');
         $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
-        $drawing->setHeight(90);
+        $drawing->setHeight(80);
+
         $drawing->setCoordinates('A2');
         $drawing->setOffsetX(5);
         $drawing->setOffsetY(10);
@@ -96,7 +108,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                 $event->sheet->getDelegate()->mergeCells('C6:E6');
                 $event->sheet->getDelegate()->mergeCells('C7:E7');
                 $event->sheet->getDelegate()->mergeCells('C8:E8');
-                $event->sheet->getDelegate()->mergeCells('A'.(count($this->data) + 13).':E'.(count($this->data) + 13));
+                $event->sheet->getDelegate()->mergeCells('A'.(count($this->data ?? []) + 13).':E'.(count($this->data ?? []) + 13));
+
 
                 /* COLOR DE FONDO DE ESTAS CELDAS */
                 $event->sheet->getDelegate()->getStyle('C2:E9')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFFFF');
@@ -158,7 +171,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
                     ]
                 );
                 $event->sheet->styleCells(
-                    'A'.(count($this->data) + 13).':E'.(count($this->data) + 13),
+                    'A'.(count($this->data ?? []) + 13).':E'.(count($this->data ?? []) + 13),
+
                     [
                       'font' => [
                           'bold' => true,
