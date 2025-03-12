@@ -72,7 +72,7 @@ $(window).load(function () {
                     '<li><a onclick="printForProductType(' + full.id + ')"><i class="fa fa-tasks"></i> Por tipo de producto</a></li>' +
                     '</ul>' +
                     '</div> ';
-                return btn_edit + btn_print + btn_delete;
+                return btn_edit +" "+ btn_delete;
             }
         }],
         'columnDefs': [
