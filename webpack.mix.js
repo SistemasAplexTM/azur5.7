@@ -43,7 +43,6 @@ mix.scripts(['resources/js/main.js'] , 'public/js/main.js');
 mix.styles(['resources/css/main.css'] , 'public/css/main.css');
 
 mix.copyDirectory('resources/js/templates', 'public/js/templates');
-mix.copyDirectory('resources/css/templates', 'public/css/templates');
 mix.copyDirectory('resources/img', 'public/img');
 
 mix.copyDirectory('resources/fonts', 'public/fonts');

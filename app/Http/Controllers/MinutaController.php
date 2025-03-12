@@ -27,6 +27,9 @@ class MinutaController extends Controller
     private $pascua_mes;
     private $pascua_dia;
 
+    private $coverage_1_3;
+    private $coverage_4_5;
+
     public function index()
     {
         // $this->assignPermissionsJavascript('menus');
@@ -347,8 +350,11 @@ class MinutaController extends Controller
         return \DataTables::of($data)->make(true);
     }
 
-    public function getMenusUnidadesByMinuta($id_minuta, $id_us)
+    public function getMenusUnidadesByMinuta($id_minuta, $id_us, $coverage_1_3, $coverage_4_5)
     {
+        $this->coverage_1_3 = $coverage_1_3;
+        $this->coverage_4_5 = $coverage_4_5;
+
         $fecha = DB::table('minuta_documento_pivot AS a')
             ->join('documento AS b', 'a.documento_id', 'b.id')
             ->select(DB::raw("min(b.fecha) AS fecha"))
@@ -427,11 +433,13 @@ class MinutaController extends Controller
     }
     public function st3()
     {
-      return $this->st1() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24)';
+      return $this->st1() . ' * ' . $this->coverage_1_3;
+    //   return $this->st1() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 24)';
     }
     public function st4()
     {
-      return $this->st2() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)';
+      return $this->st2() . ' * ' . $this->coverage_4_5;
+    //   return $this->st2() . ' * (select y.coverage from pivot_unidad_servicio_edad as y where y.unidad_servicio_id = @unidad_servicio and y.grupo_edad_id = 25)';
     }
     public function st5()
     {

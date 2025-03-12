@@ -108,7 +108,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('minuta/delete/{id}/{logical?}', 'MinutaController@delete')->name('minuta.delete');
     Route::get('minuta/restaurar/{id}', 'MinutaController@restaurar');
     Route::get('minuta/getDataSelect', 'MinutaController@getDataSelect');
-    Route::get('minuta/{id_minuta}/getMenusUnidadesByMinuta/{id_us}', 'MinutaController@getMenusUnidadesByMinuta');
+    Route::get('minuta/{id_minuta}/getMenusUnidadesByMinuta/{id_us}/{coverage_1_3}/{coverage_4_5}', 'MinutaController@getMenusUnidadesByMinuta');
     Route::get('minuta/{id_minuta}/getPedidoCompleto/{product_type?}/{id_uds?}/{name_minuta?}/{remanencia?}', 'MinutaController@getPedidoCompleto');
     Route::get('minuta/{id_minuta}/getProductsMinuta/{id_us}', 'MinutaController@getProductsMinuta');
     Route::post('minuta/{id_minuta}/saveRemanencia', 'MinutaController@saveRemanencia');

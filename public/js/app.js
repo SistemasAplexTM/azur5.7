@@ -119647,7 +119647,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           }]
         }],
         paging: false,
-        ajax: "getMenusUnidadesByMinuta/" + id_us,
+        ajax: "getMenusUnidadesByMinuta/" + id_us + "/" + this.coverage_1_3 + "/" + this.coverage_4_5,
         columns: [{
           data: "producto",
           name: "producto"
