@@ -210,8 +210,8 @@ class MinutaController extends Controller
             ->Join('documento AS c', 'c.id', 'a.documento_id')
             ->select(DB::raw("CONVERT(SUBSTR(b.`name`, 5), UNSIGNED INTEGER) AS menu"), 'c.feriado')
             ->where('a.minuta_id', $id)
-            ->groupBY(DB::raw("CONVERT(SUBSTR(b.`name`, 5), UNSIGNED INTEGER)"), 'c.feriado')
-            ->orderBy(DB::raw("CONVERT(SUBSTR(b.`name`, 5), UNSIGNED INTEGER)"))
+            ->groupBY("a.id", DB::raw("CONVERT(SUBSTR(b.`name`, 5), UNSIGNED INTEGER)"), 'c.feriado')
+            ->orderBy(DB::raw("a.id"))
             ->get();
 
         /* VALIDO QUE LOS MENUS SEAN 5, SINO, COMPLETO LAS 5 POSICIONES REPITIENDO MENUS EN ELLAS  */
