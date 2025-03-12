@@ -33,7 +33,7 @@
 				<th>{{ $header[2] }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">AVENIDA 4 NORTE # 35 A 10 - BARRIO PRADOS DEL NORTE</th>
+				<th colspan="2">Cll 34 9 195</th>
 				<th>{{ $provider->name }}</th>
 			</tr>
 			<tr>

@@ -33,7 +33,7 @@
 				<th>ENTREGA DE RACIONES - {{ $name_minuta }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">AVENIDA 4 NORTE # 35 A 10 - BARRIO PRADOS DEL NORTE</th>
+				<th colspan="2">Cll 34 9 195</th>
 				<th>DIAS DE ATENCION: </th>
 			</tr>
 			<tr>
@@ -101,10 +101,10 @@
 				<th></th>
 			</tr>
 			<tr>
-				<th>NOMBRE : NESTOR ESPINOSA</th>
+				<th>NOMBRE : Leoncio Camacho</th>
 			</tr>
 			<tr>
-				<th>CEDULA: 1151940827</th>
+				<th>CEDULA: 16832618</th>
 			</tr>
 			<tr>
 				<th>FIRMA:__________________________________</th>
