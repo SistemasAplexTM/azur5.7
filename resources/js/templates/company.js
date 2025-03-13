@@ -26,6 +26,8 @@ var objVue = new Vue({
         address: null,
         phone: null,
         logo: null,
+        delivery_person_name: null,
+        delivery_person_document: null,
         sourceLogo: null,
         editar: 0
     },
@@ -44,6 +46,17 @@ var objVue = new Vue({
                         this.nit = data.nit;
                         this.address = data.address;
                         this.phone = data.phone;
+
+                        if (data.delivery_person_info != null) {
+                            const deliveryPerson = JSON.parse(
+                                data.delivery_person_info
+                            );
+                            this.delivery_person_name =
+                                deliveryPerson.delivery_person_name;
+                            this.delivery_person_document =
+                                deliveryPerson.delivery_person_document;
+                        }
+
                         this.sourceLogo = data.logo;
                     } else {
                         // si no hay datos, se muestra un mensaje de error
@@ -71,6 +84,14 @@ var objVue = new Vue({
                         formData.append("nit", me.nit);
                         formData.append("address", me.address);
                         formData.append("phone", me.phone);
+                        formData.append(
+                            "delivery_person_name",
+                            me.delivery_person_name
+                        );
+                        formData.append(
+                            "delivery_person_document",
+                            me.delivery_person_document
+                        );
                         if (me.logo) {
                             formData.append("logo", me.logo, me.logo.name); // Append image file
                         }
@@ -130,6 +151,14 @@ var objVue = new Vue({
                         formData.append("nit", me.nit);
                         formData.append("address", me.address);
                         formData.append("phone", me.phone);
+                        formData.append(
+                            "delivery_person_name",
+                            me.delivery_person_name
+                        );
+                        formData.append(
+                            "delivery_person_document",
+                            me.delivery_person_document
+                        );
 
                         if (me.logo) {
                             formData.append("logo", me.logo, me.logo.name);

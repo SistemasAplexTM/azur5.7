@@ -86,9 +86,36 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
+                                <div class="form-group">
+                                    <div class="col-sm-5">
+                                        <label for="delivery_person_name" class="control-label gcore-label-top">Nombre de quien entrega:</label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input v-model="delivery_person_name" name="delivery_person_name" placeholder="Quien entrega los productos?" class="form-control"
+                                            type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <div class="col-sm-5">
+                                        <label for="delivery_person_document" class="control-label gcore-label-top">Documento de quien entrega:</label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input v-model="delivery_person_document" name="delivery_person_document" placeholder="Número de documento" class="form-control"
+                                            type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
                                 <div class="form-group" :class="{ 'has-error': errors.has('logo') }">
                                     <div class="col-sm-5">
-                                        <label for="logo" class="control-label gcore-label-top">Logo:</label>
+                                        <label for="logo" class="control-label gcore-label-top">Logo de la empresa:</label>
                                     </div>
                                     <div class="col-sm-7">
                                         <input @change="handleLogoUpload" name="logo" class="form-control"

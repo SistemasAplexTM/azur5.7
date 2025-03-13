@@ -149,6 +149,10 @@ class CompanyController extends Controller
 
             // Actualizar primero los demás campos
             $data->fill($request->except('logo'));
+            $data->delivery_person_info = json_encode([
+                'delivery_person_name' => $request->input('delivery_person_name'),
+                'delivery_person_document' => $request->input('delivery_person_document')
+            ]);
             $data->updated_at = now();
 
             if ($request->hasFile('logo')) {
