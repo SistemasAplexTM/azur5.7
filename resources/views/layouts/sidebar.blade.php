@@ -4,7 +4,9 @@
             <li class="nav-header">
                 <div class="dropdown profile-element">
                     <span>
-                        <img alt="image" class="img-circle" id="imgProfile" style="width: 150px;" src="{{ asset('img/logo.png') }}"/>
+                        <img alt="image" class="img-circle" id="imgProfile" style="width: 150px;"
+                            src="{{ isset($company->logo) ? asset($company->logo) : asset('img/default-logo.png') }}" />
+
                     </span>
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <span class="clear">
@@ -62,13 +64,13 @@
                         </a>
                     </li>
                     {{-- @can('menus.index') --}}
-                        <li>
-                            <a href="{{ route('menus.index') }}">
-                                <spam class="fa fa-list">
-                                </spam>
-                                Menus
-                            </a>
-                        </li>
+                    <li>
+                        <a href="{{ route('menus.index') }}">
+                            <spam class="fa fa-list">
+                            </spam>
+                            Menus
+                        </a>
+                    </li>
                     {{-- @endcan --}}
                 </ul>
             </li>
@@ -145,35 +147,35 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('administracion/presentacion')}}">
+                        <a href="{{ url('administracion/presentacion') }}">
                             <spam class="fa fa-puzzle-piece">
                             </spam>
                             Presentaciones
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('administracion/unidad_de_medida')}}">
+                        <a href="{{ url('administracion/unidad_de_medida') }}">
                             <spam class="fa fa-balance-scale">
                             </spam>
                             Unidad de medida
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('administracion/grupo_edad')}}">
+                        <a href="{{ url('administracion/grupo_edad') }}">
                             <spam class="fa fa-child">
                             </spam>
                             Grupo de edades
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('administracion/tipo_unidad_servicio')}}">
+                        <a href="{{ url('administracion/tipo_unidad_servicio') }}">
                             <spam class="fa fa-home">
                             </spam>
                             Tipo US
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('administracion/tipo_producto')}}">
+                        <a href="{{ url('administracion/tipo_producto') }}">
                             <spam class="fa fa-tags">
                             </spam>
                             Tipo producto

@@ -6,6 +6,8 @@ use App\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class CompanyController extends Controller
@@ -28,17 +30,57 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
 
+        $dataRequest = array_merge($request->all(), ['logo' => $request->file('logo')]);
+        // Definir las reglas de validación
+        $rules = [
+            'name'    => 'required|string|max:255',
+            'nit'     => 'required|string|max:100',
+            'address' => 'required|string|max:255',
+            'phone'   => 'required|string|max:50',
+            'logo' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!in_array($value->getMimeType(), $allowedMimes)) {
+                        $fail("The $attribute must be an image.");
+                    }
+                },
+                'max:2048'
+            ],
+        ];
+
+        // Crear el validador
+        $validator = Validator::make($dataRequest, $rules);
+
+        // Si falla la validación, devolver los errores
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors(),
+                'code'  => 422
+            ], 422);
+        }
+        try {
             $data = new Company;
             $data->fill($request->except('logo'));
 
             if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('logos', 'public');
-                $data->logo = $logoPath;
+                $logo = $request->file('logo');
+
+                // Directorio donde se guardará: public/img
+                $directory = public_path('img');
+
+                // Crea el directorio si no existe
+                File::makeDirectory($directory, 0755, true, true);
+
+                // Genera un nombre único para la imagen
+                $filename = uniqid() . '_' . $logo->getClientOriginalName();
+
+                // Guarda la imagen en public/img/logos
+                $logo->move($directory, $filename);
+
+                // Guarda la ruta relativa en la base de datos (ej: img/logos/abc123.jpg)
+                $data->logo = 'img/' . $filename;
             }
 
             $data->created_at = date('Y-m-d H:i:s');
@@ -75,32 +117,78 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $data           = Company::findOrFail($id);
-            $request->validate([
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
+        $rules = [
+            'name'    => 'required|string|max:255',
+            'nit'     => 'required|string|max:100',
+            'address' => 'required|string|max:255',
+            'phone'   => 'required|string|max:50',
+            'logo' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    // Validar solo si existe el archivo
+                    if ($value && !in_array($value->getMimeType(), ['image/jpeg', 'image/png', 'image/gif'])) {
+                        $fail("The $attribute must be an image.");
+                    }
+                },
+                'max:2048'
+            ],
+        ];
 
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors(),
+                'code'  => 422
+            ], 422);
+        }
+
+        try {
             $data = Company::findOrFail($id);
-            $data->update($request->except('logo'));
+            $oldLogo = $data->logo; // Guardar referencia al logo antiguo
+
+            // Actualizar primero los demás campos
+            $data->fill($request->except('logo'));
+            $data->updated_at = now();
 
             if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('logos', 'public');
-                $data->logo = $logoPath;
+                $logo = $request->file('logo');
+                $directory = public_path('img'); // Usar mismo directorio que store
+
+                // Generar nombre único conservando extensión
+                $filename = uniqid() . '_' . $logo->getClientOriginalName();
+
+                // Mover archivo a directorio destino
+                $logo->move($directory, $filename);
+
+                // Actualizar ruta en modelo
+                $data->logo = 'img/' . $filename;
+
+                // Eliminar logo anterior si existe
+                if ($oldLogo && file_exists(public_path($oldLogo))) {
+                    File::delete(public_path($oldLogo));
+                }
             }
 
-            $this->AddToLog('Company updated (id :' . $data->id . ')');
-            $answer = array(
-                "datos" => $request->all(),
-                "code"  => 200,
-            );
-            return $answer;
+            if ($data->save()) { // Single save operation
+                $this->AddToLog('Company updated (id: ' . $data->id . ')');
+                return response()->json([
+                    "data"   => $data,
+                    "code"   => 200,
+                    "status" => 200
+                ]);
+            }
+
+            return response()->json([
+                "error"  => 'Error saving record',
+                "code"   => 600,
+                "status" => 500
+            ]);
         } catch (\Exception $e) {
-            $answer = array(
+            return response()->json([
                 "error" => $e->getMessage(),
-                "code"  => 600,
-            );
-            return $answer;
+                "code"  => 600
+            ], 500);
         }
     }
 
@@ -155,6 +243,14 @@ class CompanyController extends Controller
 
     public function getCompanyById($id)
     {
-        return Company::find($id);
+        $data = Company::find($id);
+        if ($data) {
+            return response()->json([
+                'code' => 200,
+                'data' => $data,
+            ]);
+        } else {
+            return response()->json(['code' => 404, 'error' => 'Company not found'], 404);
+        }
     }
 }

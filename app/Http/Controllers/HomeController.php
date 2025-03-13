@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Company; // Import the Company model
+
 class HomeController extends Controller
+
 {
     /**
      * Create a new controller instance.
@@ -23,6 +26,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $company = Company::first(); // Fetch the first company record
+        return view('home', compact('company')); // Pass the company data to the view
     }
+
+
+
 }

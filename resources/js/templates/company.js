@@ -1,166 +1,167 @@
-$(document).ready(function () {
-    // Initialize DataTable for companies
-    $('#tbl-companies').DataTable({
-        processing: true,
-        serverSide: true,
-        searching: true,
-        ajax: 'companies/all',
-        columns: [{
-            data: 'name',
-            name: 'name'
-        }, {
-            data: 'nit',
-            name: 'nit'
-        }, {
-            data: 'address',
-            name: 'address'
-        }, {
-            data: 'phone',
-            name: 'phone'
-        }, {
-            sortable: false,
-            "render": function (data, type, full, meta) {
-                var params = [
-                    full.id, "'" + full.name + "'", "'" + full.nit + "'", "'" + full.address + "'", "'" + full.phone + "'"
-                ];
-                var btn_edit = "<a onclick=\"edit(" + params + ")\" class='btn btn-outline btn-success btn-xs' data-toggle='tooltip' data-placement='top' title='Editar'><i class='fa fa-edit'></i></a> ";
-                var btn_delete = " <a onclick=\"eliminar(" + full.id + "," + true + ")\" class='btn btn-outline btn-danger btn-xs' data-toggle='tooltip' data-placement='top' title='Eliminar'><i class='fa fa-trash'></i></a> ";
-                return btn_edit + btn_delete;
-            }
-        }]
-    });
-});
-
-function edit(id, name, nit, address, phone) {
-    var data = {
-        id: id,
-        name: name,
-        nit: nit,
-        address: address,
-        phone: phone
-    };
-    objVue.edit(data);
-}
-
 var objVue = new Vue({
-    el: '#company',
-    mounted: function () {
+    el: "#company",
+    mounted: function() {
         const dict = {
             custom: {
                 name: {
-                    required: 'El nombre es obligatorio.'
+                    required: "El nombre es obligatorio."
                 },
                 nit: {
-                    required: 'El NIT es obligatorio.'
+                    required: "El NIT es obligatorio."
                 },
                 address: {
-                    required: 'La dirección es obligatoria.'
+                    required: "La dirección es obligatoria."
                 },
                 phone: {
-                    required: 'El teléfono es obligatorio.'
+                    required: "El teléfono es obligatorio."
                 }
             }
         };
-        this.$validator.localize('es', dict);
+        this.$validator.localize("es", dict);
     },
     data: {
+        id: null,
         name: null,
         nit: null,
         address: null,
         phone: null,
+        logo: null,
+        sourceLogo: null,
         editar: 0
     },
     methods: {
-        getDataCompany(){
-            axios.get('company/getCompanyById/1').then(response => {
-                console.log(response.data);
-            });
+        getDataCompany() {
+            axios
+                .get("companies/getCompanyById/1")
+                .then(response => {
+                    console.log(response.data);
+                    // si la respuesta es mayor a 0, significa que hay datos
+                    if (response.data.code == 200) {
+                        const data = response.data.data;
+                        this.editar = 1;
+                        this.id = data.id;
+                        this.name = data.name;
+                        this.nit = data.nit;
+                        this.address = data.address;
+                        this.phone = data.phone;
+                        this.sourceLogo = data.logo;
+                    } else {
+                        // si no hay datos, se muestra un mensaje de error
+                        toastr.error("No se encontraron datos");
+                        toastr.options.closeButton = true;
+                    }
+                })
+                .catch(error => {
+                    const errorResponse = error.response.data;
+                    toastr.error(errorResponse.error);
+                    toastr.options.closeButton = true;
+                });
         },
-        resetForm: function () {
-            this.id = null;
-            this.name = null;
-            this.nit = null;
-            this.address = null;
-            this.phone = null;
-            this.editar = 0;
-            this.errors.clear();
+        handleLogoUpload(event) {
+            this.logo = event.target.files[0];
         },
-        store: function () {
-            this.$validator.validateAll().then((result) => {
-                if (result) {
-                    let me = this;
-                    axios.post('companies', {
-                        'name': this.name,
-                        'nit': this.nit,
-                        'address': this.address,
-                        'phone': this.phone,
-                    }).then(function (response) {
-                        if (response.data['code'] == 200) {
-                            toastr.success('Registro creado correctamente.');
-                            toastr.options.closeButton = true;
-                            me.resetForm();
-                            refreshTable('tbl-companies');
-                        } else {
-                            toastr.warning(response.data['error']);
-                            toastr.options.closeButton = true;
+        store: function() {
+            me = this;
+            this.$validator
+                .validateAll()
+                .then(result => {
+                    if (result) {
+                        let formData = new FormData(); // Create FormData object
+                        formData.append("name", me.name);
+                        formData.append("nit", me.nit);
+                        formData.append("address", me.address);
+                        formData.append("phone", me.phone);
+                        if (me.logo) {
+                            formData.append("logo", me.logo, me.logo.name); // Append image file
                         }
-                    }).catch(function (error) {
-                        console.log(error);
-                        toastr.error("Error. - " + error, {
-                            timeOut: 50000
-                        });
-                    });
-                } else {
-                    toastr.warning('Error en la validación');
-                }
-            }).catch(function (error) {
-                toastr.warning('Error al intentar registrar.');
-            });
+                        axios
+                            .post("companies", formData)
+                            .then(function(response) {
+                                if (response.data["code"] == 200) {
+                                    toastr.success(
+                                        "Registro creado correctamente."
+                                    );
+                                    toastr.options.closeButton = true;
+                                    me.getDataCompany();
+                                } else {
+                                    console.log(response.data);
+                                    toastr.warning(response.data["error"]);
+                                    toastr.options.closeButton = true;
+                                }
+                            })
+                            .catch(function(error) {
+                                if (
+                                    error.response &&
+                                    error.response.status === 422
+                                ) {
+                                    console.log(
+                                        "Errores de validación:",
+                                        error.response.data.error
+                                    );
+                                    toastr.error(
+                                        "Error de validación. Revisa la consola para más detalles.",
+                                        { timeOut: 50000 }
+                                    );
+                                } else {
+                                    console.log(error);
+                                    toastr.error("Error. - " + error, {
+                                        timeOut: 50000
+                                    });
+                                }
+                            });
+                    } else {
+                        toastr.warning("Error en la validación");
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error.response.data.errors);
+                    toastr.warning("Error al intentar registrar.");
+                });
         },
-        update: function () {
-            this.$validator.validateAll().then((result) => {
-                if (result) {
-                    var me = this;
-                    axios.put('companies/' + this.id, {
-                        'name': this.name,
-                        'nit': this.nit,
-                        'address': this.address,
-                        'phone': this.phone,
-                    }).then(function (response) {
-                        if (response.data['code'] == 200) {
-                            toastr.success('Registro actualizado correctamente');
-                            toastr.options.closeButton = true;
-                            me.editar = 0;
-                            me.resetForm();
-                            refreshTable('tbl-companies');
-                        } else {
-                            toastr.warning(response.data['error']);
-                            toastr.options.closeButton = true;
+        update: function() {
+            var me = this;
+            this.$validator
+                .validateAll()
+                .then(result => {
+                    if (result) {
+                        var formData = new FormData();
+                        formData.append("_method", "PUT"); // ¡Spoofing!
+                        formData.append("name", me.name);
+                        formData.append("nit", me.nit);
+                        formData.append("address", me.address);
+                        formData.append("phone", me.phone);
+
+                        if (me.logo) {
+                            formData.append("logo", me.logo, me.logo.name);
                         }
-                    }).catch(function (error) {
-                        console.log(error);
-                        toastr.error("Error. - " + error, {
-                            timeOut: 50000
-                        });
-                    });
-                }
-            }).catch(function (error) {
-                toastr.warning('Error al intentar actualizar.');
-            });
-        },
-        edit: function (data) {
-            this.id = data['id'];
-            this.name = data['name'];
-            this.nit = data['nit'];
-            this.address = data['address'];
-            this.phone = data['phone'];
-            this.editar = 1;
-        },
-        cancel: function () {
-            this.resetForm();
+                        axios
+                            .post("companies/" + me.id, formData)
+                            .then(function(response) {
+                                if (response.data["code"] == 200) {
+                                    toastr.success(
+                                        "Registro actualizado correctamente"
+                                    );
+                                    toastr.options.closeButton = true;
+                                    me.getDataCompany();
+                                } else {
+                                    toastr.warning(response.data["error"]);
+                                    toastr.options.closeButton = true;
+                                }
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                                toastr.error("Error. - " + error, {
+                                    timeOut: 50000
+                                });
+                            });
+                    }
+                })
+                .catch(function(error) {
+                    toastr.warning("Error al intentar actualizar.");
+                });
         }
     },
-    mounted: function () {
-        this.
+    mounted: function() {
+        this.getDataCompany();
     }
 });
