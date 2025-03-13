@@ -200,3 +200,14 @@
         </ul>
     </div>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Escuchar eventos de actualización del logo (ej: desde Vue)
+        window.Echo.channel('company-updates')
+            .listen('LogoUpdated', (data) => {
+                const imgProfile = document.getElementById('imgProfile');
+                imgProfile.src = data.logo_url + '?t=' + Date.now(); // Evitar caché
+            });
+    });
+    </script>
