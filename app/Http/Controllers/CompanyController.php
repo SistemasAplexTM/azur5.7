@@ -152,4 +152,9 @@ class CompanyController extends Controller
         $data = Company::get();
         return \DataTables::of($data)->make(true);
     }
+
+    public function getCompanyById($id)
+    {
+        return Company::find($id);
+    }
 }

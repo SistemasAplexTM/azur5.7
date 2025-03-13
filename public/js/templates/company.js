@@ -71,6 +71,11 @@ var objVue = new Vue({
         editar: 0
     },
     methods: {
+        getDataCompany(){
+            axios.get('company/getCompanyById/1').then(response => {
+                console.log(response.data);
+            });
+        },
         resetForm: function () {
             this.id = null;
             this.name = null;
@@ -155,4 +160,7 @@ var objVue = new Vue({
             this.resetForm();
         }
     },
+    mounted: function () {
+        this.
+    }
 });
