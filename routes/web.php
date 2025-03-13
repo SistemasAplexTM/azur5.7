@@ -64,6 +64,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('clientes/restaurar/{id}', 'ClienteController@restaurar');
     Route::get('clientes/getDataSelect', 'ClienteController@getDataSelect');
 
+    /*--- MODULO COMPANY ---*/
+    Route::resource('companies', 'CompanyController', ['except' => ['show', 'create', 'edit']]);
+    Route::get('companies/all', 'CompanyController@getAll')->name('companies.all');
+    Route::get('companies/restaurar/{id}', 'CompanyController@restaurar');
+
     /*--- MODULO UNIDAD DE SERVICIO ---*/
     Route::resource('unidadServicio', 'UnidadServicioController', ['except' => ['show', 'create', 'edit']]);
     Route::get('unidadServicio/all', 'UnidadServicioController@getAll')->name('datatable/all');
