@@ -64,6 +64,14 @@ class CompanyController extends Controller
             $data = new Company;
             $data->fill($request->except('logo'));
 
+            // Guardar delivery_person_info solo si los valores existen
+            if ($request->filled('delivery_person_name') || $request->filled('delivery_person_document')) {
+                $data->delivery_person_info = json_encode([
+                    'delivery_person_name' => strtoupper($request->input('delivery_person_name')),
+                    'delivery_person_document' => strtoupper($request->input('delivery_person_document'))
+                ]);
+            }
+
             if ($request->hasFile('logo')) {
                 $logo = $request->file('logo');
 
@@ -150,8 +158,8 @@ class CompanyController extends Controller
             // Actualizar primero los demás campos
             $data->fill($request->except('logo'));
             $data->delivery_person_info = json_encode([
-                'delivery_person_name' => $request->input('delivery_person_name'),
-                'delivery_person_document' => $request->input('delivery_person_document')
+                'delivery_person_name' => strtoupper($request->input('delivery_person_name')),
+                'delivery_person_document' => strtoupper($request->input('delivery_person_document'))
             ]);
             $data->updated_at = now();
 

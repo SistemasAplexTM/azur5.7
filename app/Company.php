@@ -19,4 +19,14 @@ class Company extends Model
     protected $fillable = [
         'id', 'nit', 'name', 'address', 'phone', 'delivery_person_info', 'logo'
     ];
+
+    // guardar datos de name, adrres en mayusculas
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtoupper($value);
+    }
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['address'] = strtoupper($value);
+    }
 }
