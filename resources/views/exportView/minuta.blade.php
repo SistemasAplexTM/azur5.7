@@ -6,7 +6,10 @@
 </head>
 
 <body>
-
+		@php
+				$delivery_person_name = json_decode($company->delivery_person_info)->delivery_person_name;
+				$delivery_person_document = json_decode($company->delivery_person_info)->delivery_person_document;
+		@endphp
 	<table border="1" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -33,11 +36,11 @@
 				<th>ENTREGA DE RACIONES - {{ $name_minuta }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">Cll 34 9 195</th>
+				<th colspan="2">{{ $company->address }}</th>
 				<th>DIAS DE ATENCION: </th>
 			</tr>
 			<tr>
-				<th colspan="2">TELEFONO 410 2392</th>
+				<th colspan="2">TELEFONO {{ $company->phone }}</th>
 				<th>FECHA DE ENTREGA : </th>
 			</tr>
 
@@ -101,10 +104,10 @@
 				<th></th>
 			</tr>
 			<tr>
-				<th>NOMBRE : Leoncio Camacho</th>
+				<th>NOMBRE : {{ $delivery_person_name }}</th>
 			</tr>
 			<tr>
-				<th>CEDULA: 16832618</th>
+				<th>CEDULA: {{ $delivery_person_document }}</th>
 			</tr>
 			<tr>
 				<th>FIRMA:__________________________________</th>

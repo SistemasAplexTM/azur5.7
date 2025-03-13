@@ -17,6 +17,7 @@ class ExportProviderFull implements FromView, WithEvents, WithDrawings
     public $letraStartTotals;
     public $letraFinal;
     public $abc;
+    public $company;
 
     public function __construct($view, $data = "", $dm = false, $provider = false, $type_product = false, $abc = false)
     {
@@ -31,6 +32,9 @@ class ExportProviderFull implements FromView, WithEvents, WithDrawings
         $this->letraFinal = $abc[(count($data['uds'])) + 4];
         $this->letraUds = $abc[(count($data['uds']))];
         $this->letraStartTotals = $abc[(count($data['uds'])) + 3];
+
+        // obtener los datos de la compañia
+        $this->company = \App\Company::first();
     }
 
     public function view(): View
@@ -39,7 +43,8 @@ class ExportProviderFull implements FromView, WithEvents, WithDrawings
             'data'          => $this->data,
             'header'        => $this->dm,
             'provider'      => $this->provider,
-            'type_product'  => $this->type_product
+            'type_product'  => $this->type_product,
+            'company'       => $this->company,
         ]);
     }
 
@@ -48,7 +53,7 @@ class ExportProviderFull implements FromView, WithEvents, WithDrawings
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
+        $drawing->setPath(public_path($this->company->logo));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         $drawing->setHeight(80);
         $drawing->setCoordinates('A2');

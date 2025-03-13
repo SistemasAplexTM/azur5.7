@@ -33,11 +33,11 @@
 				<th>{{ $header[2] }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">Cll 34 9 195</th>
+				<th colspan="2">{{ $company->address }}</th>
 				<th>{{ $provider->name }}</th>
 			</tr>
 			<tr>
-				<th colspan="2">TELEFONO {{ $provider->phone }}</th>
+				<th colspan="2">TELEFONO {{ $company->phone }}</th>
 				<th>NIT. {{ $provider->document_nit }}</th>
 			</tr>
 

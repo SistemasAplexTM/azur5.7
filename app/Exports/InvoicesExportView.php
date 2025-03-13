@@ -18,6 +18,7 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
     public $name_minuta;
     public $remanencia;
     public $minuta;
+    public $company;
 
     public function __construct($view, $data = "", $remanencias = "", $name_uds = "", $name_minuta = "", $remanencia = false, $minuta = null)
     {
@@ -28,6 +29,8 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
         $this->name_minuta  = $name_minuta;
         $this->remanencia  = $remanencia;
         $this->minuta       = $minuta;
+        // obtener los datos de la compañia
+        $this->company = \App\Company::first();
     }
 
     public function view(): View
@@ -38,7 +41,8 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
             'name_uds'      => $this->name_uds,
             'name_minuta'   => $this->name_minuta,
             'remanencia'    => $this->remanencia,
-            'minuta'        => $this->minuta
+            'minuta'        => $this->minuta,
+            'company'       => $this->company,
         ]);
     }
 
@@ -47,7 +51,7 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
+        $drawing->setPath(public_path($this->company->logo));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         $drawing->setHeight(80);
         $drawing->setCoordinates('A2');

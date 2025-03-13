@@ -17,6 +17,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
     public $dm;
     public $provider;
     public $type_product;
+    public $company;
+
 
     public function __construct($view, $data = [], $dm = false, $provider = false, $type_product = false)
 
@@ -27,6 +29,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
         $this->dm    = $dm;
         $this->provider    = $provider;
         $this->type_product    = $type_product;
+        // obtener los datos de la compañia
+        $this->company = \App\Company::first();
     }
 
     public function view(): View
@@ -40,7 +44,8 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
 
             'header'        => $this->dm,
             'provider'      => $this->provider,
-            'type_product'  => $this->type_product
+            'type_product'  => $this->type_product,
+            'company'       => $this->company,
         ]);
     }
 
@@ -49,7 +54,7 @@ class ExportProvider implements FromView, WithEvents, WithDrawings
         $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
+        $drawing->setPath(public_path($this->company->logo));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         $drawing->setHeight(80);
 

@@ -751,7 +751,6 @@ class MinutaController extends Controller
             for ($i = 65; $i <= 90; $i++) {
                 $abc[] = chr($i);
             }
-
             return Excel::download(new ExportProviderFull("exportView.proveedorFull", $menu, $dm, $provider, $type_product, $abc), 'Proveedor ' . $type_product->name . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         } else {
             foreach ($minutas as $key => $value) {
