@@ -179,29 +179,18 @@
                             Tipo producto
                         </a>
                     </li>
-                    {{-- @can('users.index')
-                        <li>
-                            <a href="{{ route('users.index') }}">
-                                <spam class="fa fa-users">
-                                </spam>
-                                Usuarios
-                            </a>
-                        </li>
-                    @endcan
-                    @can('roles.index')
-                        <li>
-                            <a href="{{ route('roles.index') }}">
-                                <spam class="fa fa-key">
-                                </spam>
-                                Roles
-                            </a>
-                        </li>
-                    @endcan --}}
                     <li>
                         <a href="{{ route('logActivity.index') }}">
                             <spam class="fa fa-history">
                             </spam>
                             Logs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('companies.index') }}">
+                            <spam class="fa fa-building">
+                            </spam>
+                            Empresa
                         </a>
                     </li>
                 </ul>
