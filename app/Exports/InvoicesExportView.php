@@ -17,8 +17,9 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
     public $name_uds;
     public $name_minuta;
     public $remanencia;
+    public $minuta;
 
-    public function __construct($view, $data = "", $remanencias = "", $name_uds = "", $name_minuta = "", $remanencia = false)
+    public function __construct($view, $data = "", $remanencias = "", $name_uds = "", $name_minuta = "", $remanencia = false, $minuta = null)
     {
         $this->view         = $view;
         $this->data         = $data;
@@ -26,6 +27,7 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
         $this->name_uds     = $name_uds;
         $this->name_minuta  = $name_minuta;
         $this->remanencia  = $remanencia;
+        $this->minuta       = $minuta;
     }
 
     public function view(): View
@@ -35,7 +37,8 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
             'remanencias'   => $this->remanencias,
             'name_uds'      => $this->name_uds,
             'name_minuta'   => $this->name_minuta,
-            'remanencia'    => $this->remanencia
+            'remanencia'    => $this->remanencia,
+            'minuta'        => $this->minuta
         ]);
     }
 
@@ -46,7 +49,7 @@ class InvoicesExportView implements FromView, WithEvents, WithDrawings
         $drawing->setDescription('Logo');
         $drawing->setPath(public_path('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
         // $drawing->setPath(asset('img/logo.png'));//para el proyecto local.. hay que pasar la ruta con asset('img/logo.png')
-        $drawing->setHeight(90);
+        $drawing->setHeight(80);
         $drawing->setCoordinates('A2');
         $drawing->setOffsetX(5);
         $drawing->setOffsetY(10);

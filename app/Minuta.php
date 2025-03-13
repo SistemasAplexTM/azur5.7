@@ -23,4 +23,10 @@ class Minuta extends Model
         'fecha_inicio', 
         'fecha_fin'
     ];
+
+    // relacion con cliente
+    public function cliente()
+    {
+        return $this->belongsTo('App\Cliente', 'clientes_id');
+    }
 }

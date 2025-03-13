@@ -14,11 +14,11 @@
 			</tr>
 			<tr>
 				<th colspan="2"></th>
-				<th>CLIENTE: CAIP INDUSTRIAL LOS MANGOS</th>
+				<th>CLIENTE: {{ $minuta->cliente->name }}</th>
 			</tr>
 			<tr>
 				<th colspan="2"></th>
-				<th>Nit: 890.318.793-8</th>
+				<th>Nit: {{ $minuta->cliente->nit }}</th>
 			</tr>
 			<tr>
 				<th colspan="2"></th>

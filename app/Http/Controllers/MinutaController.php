@@ -465,6 +465,8 @@ class MinutaController extends Controller
         $this->coverage_1_3 = $coverage_1_3;
         $this->coverage_4_5 = $coverage_4_5;
 
+        $minuta = Minuta::with('cliente')->findOrFail($id_minuta);
+
         $title = 'Pedido completo';
         if ($remanencia) {
             $title .= ' con remanencias';
@@ -564,6 +566,7 @@ class MinutaController extends Controller
                 ->get();
             $title .= ' ' . $uds[0]->tipo_uds;
         }
+
         if ($send) {
             return array(
                 'datos' => $data,
@@ -578,7 +581,7 @@ class MinutaController extends Controller
             // return view('exportView/minutaAll', compact('data', 'uds'));
             if ($id_uds != null and $id_uds != 'null') {
                 $title = $uds[0]->name_uds;
-                return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia), 'Minuta ' . $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+                return Excel::download(new InvoicesExportView("exportView.minuta", $data, $remanencias, $uds[0]->name_uds, $name_minuta, $remanencia, $minuta), 'Minuta ' . $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
             } else {
                 return Excel::download(new InvoicesExport(
                     "exportView.minutaAll",
@@ -586,7 +589,8 @@ class MinutaController extends Controller
                         'datos' => $data,
                         'uds' => $uds,
                         'remanencias' => $remanencias,
-                        'remanencia' => $remanencia
+                        'remanencia' => $remanencia,
+                        'minuta' => $minuta
                     )
                 ), $title . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
             }
